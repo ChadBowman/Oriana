@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>class Call - RDoc Documentation</title>
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script src="./js/jquery.js"></script>
+<script src="./js/darkfish.js"></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+
+<body id="top" role="document" class="class">
+<nav role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search" spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+
+  <div id="class-metadata">
+    
+    <div id="parent-class-section" class="nav-section">
+  <h3>Parent</h3>
+
+  
+  <p class="link">Object
+  
+</div>
+
+    
+    
+    <!-- Method Quickref -->
+<div id="method-list-section" class="nav-section">
+  <h3>Methods</h3>
+
+  <ul class="link-list" role="directory">
+    
+    <li ><a href="#method-c-new">::new</a>
+    
+    <li ><a href="#method-i-make_call">#make_call</a>
+    
+  </ul>
+</div>
+
+  </div>
+</nav>
+
+<main role="main" aria-labelledby="class-Call">
+  <h1 id="class-Call" class="class">
+    class Call
+  </h1>
+
+  <section class="description">
+    
+<p>Sends HTTPS Post requests in XML to eBay</p>
+
+  </section>
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <section class="attribute-method-details" class="method-section">
+      <header>
+        <h3>Attributes</h3>
+      </header>
+
+      
+      <div id="attribute-i-token" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">token</span><span
+            class="attribute-access-type">[W]</span>
+        </div>
+
+        <div class="method-description">
+        
+        <p>User authenticaion token</p>
+        
+        </div>
+      </div>
+      
+    </section>
+    
+
+    
+     <section id="public-class-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Class Methods</h3>
+       </header>
+
+    
+      <div id="method-c-new" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">new</span><span
+            class="method-args">( token, production = true )</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Params:</p>
+<dl class="rdoc-list note-list"><dt><code>production</code>
+<dd>
+<p>Set true when using eBay&#39;s Production environment, false when using the
+Sandbox environment for testing</p>
+</dd><dt><code>token</code>
+<dd>
+<p>User&#39;s authentication token</p>
+</dd></dl>
+          
+          
+
+          
+          <div class="method-source-code" id="new-source">
+            <pre><span class="ruby-comment"># File Ebay.rb, line 16</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>( <span class="ruby-identifier">token</span>, <span class="ruby-identifier">production</span> = <span class="ruby-keyword">true</span> )
+<span class="ruby-keyword">self</span>.<span class="ruby-identifier">token</span> = <span class="ruby-identifier">token</span>
+<span class="ruby-ivar">@production</span> = <span class="ruby-identifier">production</span>
+
+<span class="ruby-comment"># Configurations</span>
+<span class="ruby-ivar">@dev_id</span> = <span class="ruby-string">&#39;48e6fd8d-6fbe-424a-bcec-85ba23ee9e7f&#39;</span>
+
+<span class="ruby-keyword">if</span> <span class="ruby-identifier">production</span>
+  <span class="ruby-ivar">@uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span>( <span class="ruby-string">&#39;https://api.ebay.com/ws/api.dll&#39;</span> )
+  <span class="ruby-ivar">@app_id</span> = <span class="ruby-string">&#39;OrthusTe-b249-4e73-a34e-763549ce8b1e&#39;</span>
+  <span class="ruby-ivar">@cert_id</span> = <span class="ruby-string">&#39;3f3a6c4d-1b02-40dc-8b8c-295cc7043dd3&#39;</span>
+<span class="ruby-keyword">else</span>
+  <span class="ruby-ivar">@uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span>( <span class="ruby-string">&#39;https://api.sandbox.ebay.com/ws/api.dll&#39;</span> )
+  <span class="ruby-ivar">@app_id</span> = <span class="ruby-string">&#39;OrthusTe-96ce-48db-a0e4-82dbbcb37804&#39;</span>
+  <span class="ruby-ivar">@cert_id</span> = <span class="ruby-string">&#39;e6547f74-f0f3-473f-9b73-03814cd78dc6&#39;</span>
+<span class="ruby-keyword">end</span>
+
+<span class="ruby-ivar">@https</span> = <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span>.<span class="ruby-identifier">new</span>( <span class="ruby-ivar">@uri</span>.<span class="ruby-identifier">host</span>, <span class="ruby-ivar">@uri</span>.<span class="ruby-identifier">port</span> )
+<span class="ruby-ivar">@https</span>.<span class="ruby-identifier">use_ssl</span> = <span class="ruby-keyword">true</span>  
+<span class="ruby-ivar">@https</span>.<span class="ruby-identifier">verify_mode</span> = <span class="ruby-constant">OpenSSL</span><span class="ruby-operator">::</span><span class="ruby-constant">SSL</span><span class="ruby-operator">::</span><span class="ruby-constant">VERIFY_NONE</span> <span class="ruby-comment"># Quick fix for ruby SSL verification problem</span>
+
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+    </section>
+  
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
+       <header>
+         <h3>Public Instance Methods</h3>
+       </header>
+
+    
+      <div id="method-i-make_call" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">make_call</span><span
+            class="method-args">( call, content = '' )</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Params:</p>
+<dl class="rdoc-list note-list"><dt><code>call</code>
+<dd>
+<p><a href="Call.html">Call</a> command from eBay&#39;s API</p>
+</dd><dt><code>content</code>
+<dd>
+<p>Formatted content needed for the particular call command</p>
+</dd></dl>
+
+<p>Returns:</p>
+<ol><li>
+<p><code>boolean</code> true if the call was sucessfull, false if not</p>
+</li><li>
+<p><code>string</code> Response body</p>
+</li><li>
+<p><code>list</code> Response header information</p>
+</li></ol>
+          
+          
+
+          
+          <div class="method-source-code" id="make_call-source">
+            <pre><span class="ruby-comment"># File Ebay.rb, line 47</span>
+        <span class="ruby-keyword">def</span> <span class="ruby-identifier">make_call</span>( <span class="ruby-identifier">call</span>, <span class="ruby-identifier">content</span> = <span class="ruby-string">&#39;&#39;</span> )
+
+        <span class="ruby-identifier">body</span> = <span class="ruby-value">&lt;&lt;END
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;#{call}Request xmlns=&quot;urn:ebay:apis:eBLBaseComponents&quot;&gt;
+        &lt;RequesterCredentials&gt;
+                &lt;eBayAuthToken&gt;#{@token}&lt;/eBayAuthToken&gt;
+        &lt;/RequesterCredentials&gt;
+#{content}
+&lt;/#{call}Request&gt;
+END</span>
+
+        <span class="ruby-identifier">header</span> = {
+          <span class="ruby-string">&#39;Content-Type&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;text/xml&#39;</span>,
+          <span class="ruby-string">&#39;X-EBAY-API-SITEID&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;0&#39;</span>,
+          <span class="ruby-string">&#39;X-EBAY-API-CALL-NAME&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">call</span>,
+          <span class="ruby-string">&#39;X-EBAY-API-CERT-NAME&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@cert_id</span>,
+          <span class="ruby-string">&#39;X-EBAY-API-APP-NAME&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@app_id</span>,
+          <span class="ruby-string">&#39;X-EBAY-API-DEV-NAME&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@dev_id</span>,
+          <span class="ruby-string">&#39;X-EBAY-API-COMPATIBILITY-LEVEL&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;391&#39;</span> }
+
+        <span class="ruby-identifier">response</span> = <span class="ruby-ivar">@https</span>.<span class="ruby-identifier">post</span>( <span class="ruby-ivar">@uri</span>.<span class="ruby-identifier">path</span>, <span class="ruby-identifier">body</span>, <span class="ruby-identifier">header</span> )
+
+        <span class="ruby-identifier">status</span> = <span class="ruby-keyword">false</span>
+        <span class="ruby-identifier">status</span> = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>[<span class="ruby-regexp">/&lt;Ack&gt;.*&lt;\/Ack&gt;/</span>].<span class="ruby-identifier">include?</span> <span class="ruby-string">&#39;Success&#39;</span>
+
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">status</span>, <span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>, <span class="ruby-identifier">response</span>
+
+        <span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+    </section>
+  
+  </section>
+</main>
+
+
+<footer id="validator-badges" role="contentinfo">
+  <p><a href="http://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="http://docs.seattlerb.org/rdoc/">RDoc</a> 4.2.0.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
