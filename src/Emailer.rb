@@ -98,8 +98,8 @@ END
 	end
 end
 
-email = Emailer.new('John Gibel', 'johngibel@gmail.com')
+email = Emailer.new('Kirby Miller', 'kmiller0184@yahoo.co')
 
-#email.purchase_confirmation
+email.purchase_confirmation
 #email.aquisition_notice
-email.completion_notice('9405509699939973332248')
+#email.completion_notice('9405509699939022751617')

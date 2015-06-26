@@ -69,7 +69,9 @@ class Tag
 	# +name+:: Name of name you'd like to find
 	#
 	# Returns:
-	# +Array+ of Tags with matching name names
+	# +nil+ if search fails
+	# +String+ of Tag value if only one Tag matched
+	# +Array+ of Tags if multiple matches found
 	def []( name )
 		result = self.find_name name
 
@@ -172,9 +174,9 @@ class XML
 	# +name+:: Name of name to find
 	#
 	# Returns:
-	# - nil if search unsucessful
-	# - String value if only one Tag matched
-	# - Array of Tag if more than one matched
+	# +nil+ if search unsucessful
+	# +String+ value if only one Tag matched
+	# +Array+ of Tag if more than one matched
 	def []( name )
 
 		# Query root

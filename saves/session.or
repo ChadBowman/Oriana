@@ -1,0 +1,20 @@
+--- !ruby/object:Session
+color_lists:
+  disabled:
+  - n/a
+  ds lite:
+  - Crimson
+  - Cobalt
+  - Black
+  - White
+quality_lists:
+  disabled:
+  - n/a
+  standard:
+  - New
+  - Good
+  - Used
+  - Bad
+inventory: !ruby/object:Inventory
+  inventory: {}
+  templates: {}
