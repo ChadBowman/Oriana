@@ -1,5 +1,6 @@
-
-require 'yaml'
+# Author::    Chad Bowman (mailto:chad.bowman0@gmail.com)
+# Copyright:: Copyright (c) 2015 Orthus Technology
+# License::   Distributes under the same terms as Ruby
 
 class Inventory
 
@@ -41,7 +42,7 @@ class Inventory
 		template = @templates[ id ]
 
 		unless template.is_a? NilClass
-			str += "#{space}#{template.name} [#{id}]"
+			str += "#{space}[#{id}] #{template.name}"
 
 			template.part_map.each do |pair|
 				str += "\n#{template_to_s( pair[0], space + '  ' )}"

@@ -1,6 +1,6 @@
 --- !ruby/object:Session
 color_lists:
-  disabled:
+  disabled: &1
   - n/a
   ds lite:
   - Crimson
@@ -8,7 +8,7 @@ color_lists:
   - Black
   - White
 quality_lists:
-  disabled:
+  disabled: &2
   - n/a
   standard:
   - New
