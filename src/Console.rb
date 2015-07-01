@@ -117,6 +117,41 @@ class Input
 		self.value = value
 	end
 
+	# Returns hash with flags as keys and arguments as values
+	# 	-f argument >> f => arugment
+	# 
+	# Parameter:
+	# +command+:: command to remove from argument
+	def get_flags( command = nil )
+		# Remove command, split by spaces
+		if command.is_a? NilClass
+			vars = self.value.split ' '
+		else
+			vars = self.value.sub( /#{command} ?/, '' ).split ' '
+		end
+
+		# Hash to return
+		flags = Hash.new
+		# for each pair of arugments, place in Hash
+		# 	flags[ flag ] = argument
+		vars.each_cons(2) do |this, nxt|
+			# If first element is a valid flag
+			if this =~ /^-\S+/ 
+				# Replace underscores
+				value = nxt.gsub('_', ' ')
+				# parse true/false values
+				value = true if value.include? 'yes' or value.include? 'true'
+				value = false if value.include? 'no' or value.include? 'false'
+
+				flags[ this.sub('-', '') ] = value
+			end
+		end		
+
+		# Return result
+		flags
+
+	end # get_flags
+
 	# Returns array of variables split by spaces. _ are repalced with space.
 	# 
 	# Parameter:
@@ -124,14 +159,20 @@ class Input
 	def get_vars( command = nil )
 		# Remove command and split by space.
 		if command.is_a? NilClass
-			vars = self.value.split(' ')
+			# No command, so just split
+			vars = self.value.split ' '
 		else
-			vars = self.value.sub( "#{command} ", '' ).split(' ')
+			vars = self.value.sub( /#{command} ?/, '' ).split ' '
 		end
 
-		# Replace underscores with spaces
 		vars.map! do |element|
-			element.gsub('_', ' ')
+			# Replace underscores
+			element.gsub!('_', ' ')
+			# Parse true/false values
+			element = true if element.include? 'yes' or element.include? 'true'
+			element = false if element.include? 'no' or element.include? 'false'
+			# Return to map
+			element
 		end
 		
 		# Return element if only 1 exists, else the array
@@ -172,7 +213,7 @@ class TextManager < Tk::Text
 	# +text+:: text to place at prompt location. Newlines are repalced with space.
 	def prompt( text )
 		text.gsub!("\n", ' ')
-		replace "#{@lines}.0", "#{@lines}.#{@bound}", text
+		replace "#{@lines}.0", "#{@lines}.end", text
 	end
 
 	# Posts text in Main pane
