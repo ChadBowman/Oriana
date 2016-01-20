@@ -7,26 +7,33 @@
 # testuser_orthus_buyer  Cer6eru$
 
 require 'net/https'
-require_relative 'XML'
+require 'nokogiri'
+require_relative '../utility/XML'
+require_relative '../utility/Constants'
 
 # Sends and receives HTTPS Post requests in XML to eBay
 class Call
 
-	# +token+:: User's authentication token
-	attr_writer :token
 
+
+	# +token+:: User's authentication token
 	# +trading_version+:: Trading API version number
 	# +shopping_version+:: Shopping API version number
-	attr_accessor :trading_version, :shopping_version
+	attr_accessor :trading_version, :shopping_version, :token
 
 	# Parameters:
-	# +production+:: Set true when using eBay's Production environment, false when using the Sandbox environment for testing
 	# +token+:: User's authentication token
-	def initialize( token, production = true, trading_version = '921', shopping_version = '517' )
-		self.token = token
+	# +app_id+:: Assigned eBay App ID.
+	# +cert_id+:: Assigned eBay certificate ID.
+	# +production+:: Set true when using eBay's Production environment, false when using the Sandbox environment for testing
+	def initialize( app_id, cert_id, production = true, token = nil )
+		
+		@app_id = app_id
+		@cert_id = cert_id
 		@production = production
-		@trading_version = trading_version
-		@shopping_version = shopping_version
+		@trading_version = '921'
+		@shopping_version = '517'
+		@token = token
 
 		# Configurations
 		@dev_id = '48e6fd8d-6fbe-424a-bcec-85ba23ee9e7f'
@@ -34,13 +41,9 @@ class Call
 		if production
 			@trade_uri = URI.parse 'https://api.ebay.com/ws/api.dll'
 			@shop_uri = URI.parse 'http://open.api.ebay.com/shopping?'
-			@app_id = 'OrthusTe-b249-4e73-a34e-763549ce8b1e'
-			@cert_id = '3f3a6c4d-1b02-40dc-8b8c-295cc7043dd3'
 		else
 			@trade_uri = URI.parse 'https://api.sandbox.ebay.com/ws/api.dll'
 			@shop_uri = URI.parse 'http://open.api.sandbox.ebay.com/shopping?'
-			@app_id = 'OrthusTe-96ce-48db-a0e4-82dbbcb37804'
-			@cert_id = 'e6547f74-f0f3-473f-9b73-03814cd78dc6'
 		end
 
 		# Trading API, HTTPS setup
@@ -52,6 +55,29 @@ class Call
 		@shop = Net::HTTP.new( @shop_uri.host, @shop_uri.port )
 
 	end # initialize
+
+	def make_no_auth_trade_call( call, content = '' )
+		
+		call_body = <<-END
+<?xml version="1.0" encoding="utf-8"?>
+<#{call}Request xmlns="urn:ebay:apis:eBLBaseComponents">
+#{content}
+</#{call}Request>
+		END
+
+		header = {
+			'Content-Type' => 'text/xml',
+			'X-EBAY-API-SITEID' => '0',
+			'X-EBAY-API-CALL-NAME' => call,
+			'X-EBAY-API-CERT-NAME' => @cert_id,
+			'X-EBAY-API-APP-NAME' => @app_id,
+			'X-EBAY-API-DEV-NAME' => @dev_id,
+			'X-EBAY-API-COMPATIBILITY-LEVEL' => @trading_version,
+			'X-EBAY-API-DETAIL-LEVEL' => '0' }
+
+		XML.new @trade.post( @trade_uri.path, call_body, header ).body
+
+	end # make_no_auth_trade_call
 
 
 	# Makes a call to eBay's Trading API. Requires a working token to work.
@@ -66,14 +92,14 @@ class Call
 	def make_trade_call( call, content = '' )
 
 		call_body = <<-END
-			<?xml version="1.0" encoding="utf-8"?>
-			<#{call}Request xmlns="urn:ebay:apis:eBLBaseComponents">
-				<RequesterCredentials>
-					<eBayAuthToken>#{@token}</eBayAuthToken>
-				</RequesterCredentials>
-			#{content}
-			</#{call}Request>
-			END
+<?xml version="1.0" encoding="utf-8"?>
+<#{call}Request xmlns="urn:ebay:apis:eBLBaseComponents">
+	<RequesterCredentials>
+		<eBayAuthToken>#{@token}</eBayAuthToken>
+	</RequesterCredentials>
+#{content}
+</#{call}Request>
+END
 
 		header = {
 			'Content-Type' => 'text/xml',
@@ -82,8 +108,9 @@ class Call
 			'X-EBAY-API-CERT-NAME' => @cert_id,
 			'X-EBAY-API-APP-NAME' => @app_id,
 			'X-EBAY-API-DEV-NAME' => @dev_id,
-			'X-EBAY-API-COMPATIBILITY-LEVEL' => @trading_version }
-
+			'X-EBAY-API-COMPATIBILITY-LEVEL' => @trading_version,
+			'X-EBAY-API-DETAIL-LEVEL' => '0' }
+		
 		# Post request and get response
 		XML.new @trade.post( @trade_uri.path, call_body, header ).body
 
@@ -159,3 +186,6 @@ END
 	end # upload_pictures
 
 end # Call
+
+s = Call.new( Orthus::BUYER_TOKEN, Orthus::SANDBOX_APP_ID, Orthus::SANDBOX_CERT_ID, false )
+o = Call.new( Orthus::TOKEN, Orthus::PRODUCTION_APP_ID, Orthus::PRODUCTION_CERT_ID )

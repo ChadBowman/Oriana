@@ -3,7 +3,7 @@
 # License::   Distributes under the same terms as Ruby
 
 require 'yaml'
-require_relative 'src/Console'
+require_relative 'src/gui/Console'
 require_relative 'src/Courier'
 require_relative 'src/Inventory'
 require_relative 'src/Coin'
@@ -36,18 +36,23 @@ class Oriana
 		end # load save file
 
 		# variable for managing Console input state. Set to standard for normal action.
-		@state = :standard
+		state = :standard
 
 		# Create the console
 		# Block: All actions for input
 		@console = Console.new( 30, 120, 'Oriana') do |input, out|
 
 			# Input STATE switch
-			case @state
+			case state
 			# Standard input
 			when :standard
 				case input.value
 
+				###########################################################################################################
+				##### PURCHASE ASSEMBLY
+				when /^ /
+
+				###########################################################################################################
 				##### PROFILE ACTIONS
 				when /^set profile/													# SET PROFILE
 					x = input.get_vars( 'set profile' ).to_sym						# grab profile name
@@ -68,15 +73,31 @@ class Oriana
 				when /^create (color|quality) list/									# CREATE LIST
 					if input.value.include? 'color'									# color
 						vars = input.get_vars( 'create color list' )				# gather variables
-						name = vars.first											# snag the name
-						@s.color_lists[ name ] = vars[ 1, vars.length - 1 ]			# input the rest into session hash
-						out.prompt "Color list #{name} added."						# output results
+
+						if vars.empty? 												# argument format requested
+							out.prompt '_ name, color 1, color 2, ...'
+							@console.in.insert 0, 'create color list '
+						elsif !vars.is_a? Array 									# user only submitted a name
+							out.prompt 'You must have at least 1 color.'
+						else
+							name = vars.first										# snag the name
+							@s.color_lists[ name ] = vars[ 1, vars.length - 1 ]		# input the rest into session hash
+							out.prompt "Color list #{name} added."					# output results
+						end
 
 					else															# quality
 						vars = input.get_vars( 'create quality list' )				# gather variables
-						name = vars.first											# snag the name
-						@s.quality_lists[ name ] = vars[ 1, vars.length - 1 ]		# input the rest into session hash
-						out.prompt "Quality list #{name} added."					# output results
+
+						if vars.empty? 												# argument format requested
+							out.prompt '_ name, quality 1, quality 2, ...'
+							@console.in.insert 0, 'create quality list '
+						elsif !vars.is_a? array 									# user only submitted a name
+							out.prompt 'You must have at least 1 quality.'
+						else	
+							name = vars.first										# snag the name
+							@s.quality_lists[ name ] = vars[ 1, vars.length - 1 ]	# input the rest into session hash
+							out.prompt "Quality list #{name} added."				# output results
+						end
 					end
 
 				when /^add colors? to/												# ADD COLORS TO LIST
@@ -113,6 +134,47 @@ class Oriana
 
 					out.prompt "#{var} deleted."									# Output results
 
+				when /^delete \w+ from \w+/ 										# DELETE COLOR OR QUALITY
+					vars = input.value.gsub( /(delete |from )/, '' ).split( ' ' ) 	# Extract variables
+					vars.map! do |element|
+						element.gsub( '_', ' ')
+					end
+
+					if vars.length != 2 											# Check formatting
+						out.prompt 'Invalid number of variables.'
+						return
+					end
+
+					colors = @s.color_lists[ vars[1] ] 								# Grab from lists
+					quals = @s.quality_lists[ vars[1] ]
+
+					if colors.is_a? NilClass and quals.is_a? NilClass 				# Check list selection
+						out.prompt "#{vars[1]} is not a color or quality list."
+						return
+					end
+
+					if colors.is_a? Array 											# Delete color
+						colors = colors.delete vars[0]
+						if colors.is_a? NilClass
+							out.prompt "#{vars[0]} not found." 
+							return
+						end
+					end
+
+					if quals.is_a? Array 											# Delete quality
+						quals = quals.delete vars[0] 
+						if quals.is_a? NilClass
+							out.prompt "#{vars[0]} not found."
+							return
+						end
+					end
+
+					if colors.is_a? Array and quals.is_a? Array 					# Output results
+						out.prompt "#{vars[0]} deleted from both #{vars[1]} lists."
+					else
+						out.prompt "#{vars[0]} deleted from #{vars[1]}."
+					end
+
 				when /^show (color|quality) lists/									# SHOW LISTS
 					str = String.new 												# output string
 
@@ -140,7 +202,7 @@ class Oriana
 							return
 						end
 																					# display help
-						out.prompt '... parent, name, color list?, quality list?, quantity?, required?, atom?'
+						out.prompt '_ parent, name, color list?, quality list?, quantity?, required?, atom?'
 						out.post @s.inventory.templates_to_s
 						out.post_sub @s.lists_to_s
 						@console.in.insert 0, 'add template '
@@ -160,12 +222,43 @@ class Oriana
 					requ = true
 					atom = false
 
+					if name =~ /^\d+$/ 												# adding already made part
+				 		# When using a template ID instead of a name
+				 		# that part is added to parent part map and the only
+				 		# arguments allowed are required and atom
+				 		unless vars[2].is_a? NilClass 								# If required argument exists				
+				 			unless vars[2].is_a? TrueClass or vars[2].is_a? FalseClass
+				 				out.prompt 'Invalid option for required.'
+				 				return
+				 			else
+				 				requ = vars[2]
+				 			end
+				 		end
+
+				 		unless vars[3].is_a? NilClass
+				 			unless vars[3].is_a? TrueClass or vars[3].is_a? FalseClass
+				 				out.prompt 'Invalid option for atom.'
+				 				return
+				 			else
+				 				atom = vars[3]
+				 			end
+				 			
+				 		end
+
+				 																	# Add ID/req to parent's part map
+				 		@s.inventory.templates[ parent ].part_map[name] = [requ, atom]	
+				 		out.post @s.inventory.template_to_s parent 					# Post update
+				 		@console.in.insert '0', "#{parent} " 						# Insert parent ID for speed
+				 		out.prompt 'parent, name, color list?, quality list?, quantity?, required?, atom?'
+				 		return
+				 	end
+
 					unless vars[2].is_a? NilClass 									# If imposing color list
 						if @s.color_lists[ vars[2] ].is_a? NilClass 				# check for color list
 							out.prompt 'Color List not found.' 						# return if not found
 							return
 						else
-							colors = { vars[2] => @s.availible_colors[ vars[2] ] }  # assign properly
+							colors = { vars[2] => @s.color_lists[ vars[2] ] }  # assign properly
 						end
 					end
 
@@ -174,7 +267,7 @@ class Oriana
 							out.prompt 'Quality List not found.' 					# return if not found
 							return
 						else														# assign properly
-							qualities = { vars[3] => @s.availible_qualities[ vars[3] ] }
+							qualities = { vars[3] => @s.quality_lists[ vars[3] ] }
 						end
 					end
 					
@@ -217,9 +310,12 @@ class Oriana
 				when /^create template$/ 											# CREATE TEMPLATE
 					out.prompt 'name, color list, quality list' 					# display arguments
 					out.post_sub @s.lists_to_s										# Display list options
-					@state = :template  											# Set unput state
+					state = :template  											# Set unput state
 
-				when /^show templates/ 												# SHOW TEMPLATES
+				when /^show templates detailed/ 									# SHOW TEMPLATES
+					out.post @s.inventory.templates_to_s true 						# with details
+
+				when /^show templates$/												# SHOW TEMPLATES
 					out.post @s.inventory.templates_to_s							# display templates
 
 				when /^delete template/ 											# DELETE TEMPLATE
@@ -243,8 +339,8 @@ class Oriana
 					end		
 
 					if vars.empty? 													# display argument options
-						out.prompt '... id -n name -u quantity -c colors -q qualities -d delete -ch child :[-r required -a atom]'
-						out.post @s.inventory.templates_to_s 						# display templates
+						out.prompt '_ id -n name -u quantity -c colors -q qualities -d delete -ch child :[-r required -a atom]'
+						out.post @s.inventory.templates_to_s true					# display templates
 						out.post_sub @s.lists_to_s 									# display lists
 						@console.in.insert 0, 'edit template ' 						# replace command
 						return
@@ -330,8 +426,8 @@ class Oriana
 					parent.part_map[ vars['ch'] ][1] = atm unless vars['a'].is_a? NilClass 	# replace atom
 					parent.part_map.delete( vars['d'] ) unless vars['d'].is_a? NilClass		# delete child
 
-					out.post @s.inventory.template_to_s id 	 								# display changes
-					out.prompt '... id -n name -u quantity -c colors -q qualities -d delete -ch child :[-r required -a atom]'
+					out.post @s.inventory.template_to_s id, true 							# display changes
+					out.prompt '_ id -n name -u quantity -c colors -q qualities -d delete -ch child :[-r required -a atom]'
 					@console.in.insert 0, 'edit template ' 									# replace command
 
 				###########################################################################################################
@@ -348,12 +444,12 @@ class Oriana
 				case input.value
 				when /^exit/ 														# EXIT TEMPLATE CREATION
 					out.prompt 'Exited template creation.' 
-					@state = :standard 												# set state back
+					state = :standard 												# set state back
 
-				when /^\d+/ 														# CREATE CHILD TEMPLATE
+				when /^\d+ / 														# CREATE CHILD TEMPLATE
 					
-					if @root_id.is_a? NilClass 										# Check to make sure parent Template was created
-						prompt 'Create a parent template first.' 					# If not, return
+					if root_id.is_a? NilClass 										# Check to make sure parent Template was created
+						out.prompt 'Create a parent template first.' 				# If not, return
 						return
 					end
 
@@ -376,39 +472,60 @@ class Oriana
 				 	quant = 1														# set default quantity (1)
 				 	atom = false 													# set default atom
 
-				 	unless vars[2].is_a? NilClass 									# If require argument exists
-				 		unless vars[2].is_a? TrueClass or vars[2].is_a? FalseClass
-				 			out.prompt 'Invalid option for required.'  				# invalid requirement argument, return
-				 			return
-				 		else
-				 			req = vars[2]
+				 	if name =~ /^\d+$/ 												# adding already made part
+				 		# When using a template ID instead of a name
+				 		# that part is added to parent part map and the only
+				 		# arguments allowed are required and atom
+				 		unless vars[2].is_a? NilClass 								# If required argument exists				
+				 			unless vars[2].is_a? TrueClass or vars[2].is_a? FalseClass
+				 				out.prompt 'Invalid option for required.' 
+				 				return
+				 			else
+				 				req = vars[2]
+				 			end
 				 		end
+
+				 		unless vars[3].is_a? NilClass 								# If atom argument exists
+				 			unless vars[3].is_a? TrueClass or vars[3].is_a? FalseClass
+				 				out.prompt 'Invalid option for atom.'
+				 				return
+				 			else
+				 				atom = vars[3]
+				 			end
+				 			
+				 		end
+
+				 		@s.inventory.templates[ parent ].part_map[name] = [req, atom]	# Add ID/req to parent's part map
+				 		out.post @s.inventory.template_to_s root_id 				# Post update
+				 		@console.in.insert '0', "#{parent} " 						# Insert parent ID for speed
+				 		out.prompt 'parent, name, color list?, quality list?, quantity?, required?, atom?'
+				 		return
 				 	end
 
-				 	unless vars[3].is_a? NilClass 									# If color list arugment exists
-				 		if @s.color_lists[ vars[3] ].is_a? NilClass 				# Check if color list exists. If not, return
-							out.prompt "#{vars[3]} is not a valid color list."
+				 	unless vars[2].is_a? NilClass 									# If color list arugment exists
+				 		if @s.color_lists[ vars[2] ].is_a? NilClass 				# Check if color list exists. If not, return
+							out.prompt "#{vars[2]} is not a valid color list."
 							return
 						end
 
 						# Tempaltes have colors and qualities in a hash with only one element
 						# so which color list was used can be identified by the key.
 						# 	name => color list array
-						colors = { vars[3] => @s.color_lists[ vars[3] ] } 			# set colors to special Hash
+						colors = { vars[2] => @s.color_lists[ vars[2] ] } 			# set colors to special Hash
 				 	end
 
-				 	unless vars[4].is_a? NilClass 									# If quality list arugment exits
-				 		if @s.quality_lists[ vars[4] ].is_a? NilClass 				# Check if quality list exists. If not, return
-							out.prompt "#{vars[4]} is not a valid quality list."
+				 	unless vars[3].is_a? NilClass 									# If quality list arugment exits
+				 		if @s.quality_lists[ vars[3] ].is_a? NilClass 				# Check if quality list exists. If not, return
+							out.prompt "#{vars[3]} is not a valid quality list."
 							return
 						end
 
-						quals = { vars[4] => @s.quality_lists[ vars[4] ] } 			# set qualities to special Hash
+						quals = { vars[3] => @s.quality_lists[ vars[3] ] } 			# set qualities to special Hash
 				 	end
 
-				 	unless vars[5].is_a? NilClass 									# If quantity argument exists
+				 	unless vars[4].is_a? NilClass 									# If quantity argument exists
 				 		begin
-				 			quant = Integer( vars[5] ) 								# Convert to Fixnum
+				 			quant = Integer( vars[4] ) 								# Convert to Fixnum
 				 			raise ArgumentError if quant < 1
 				 		rescue ArgumentError 										# Check if valid quantity, if not return
 				 			out.prompt 'Quantity argument should be a number and > 0.'
@@ -416,9 +533,18 @@ class Oriana
 				 		end
 				 	end
 
+				 	unless vars[5].is_a? NilClass 									# If require argument exists
+				 		unless vars[5].is_a? TrueClass or vars[5].is_a? FalseClass
+				 			out.prompt 'Invalid option for required.'  				# invalid requirement argument, return
+				 			return
+				 		else
+				 			req = vars[5]
+				 		end
+				 	end
+
 				 	unless vars[6].is_a? NilClass 									# If atom argument exists
 				 		unless vars[6].is_a? TrueClass or vars[6].is_a? FalseClass
-				 			out.prompt 'Invalid option for required.'  				# invalid requirement argument, return
+				 			out.prompt 'Invalid option for atom.'  				# invalid requirement argument, return
 				 			return
 				 		else
 				 			atom = vars[6]
@@ -428,7 +554,7 @@ class Oriana
 				 	if !@s.inventory.templates[ name ].is_a? NilClass 				# Check if name is actually an ID
 				 		id = name 													# snag id
 				 		@s.inventory.templates[ parent ].part_map[id] = [req, atom]	# Add template to parent part map
-				 		out.post @s.inventory.template_to_s @root_id 				# Post results
+				 		out.post @s.inventory.template_to_s root_id 				# Post results
 				 		@console.in.insert '0', "#{parent} " 						# Insert parent ID for speed
 				 		return 														# Break because we are finished
 				 	end
@@ -437,9 +563,10 @@ class Oriana
 
 				 	@s.inventory << Template.new( name, id, colors, quals, quant ) 	# Add new template to Inventory
 				 	@s.inventory.templates[ parent ].part_map[id] = [req, atom]		# Add ID/req to parent's part map
-				 	out.post @s.inventory.template_to_s @root_id 					# Post update
+				 	out.post @s.inventory.template_to_s root_id 					# Post update
 				 	@console.in.insert '0', "#{parent} " 							# Insert parent ID for speed
-				 	out.prompt 'parent(id), name, required?, color list?, quality list?, quantity?, atom?'
+				 	out.prompt 'parent, name, color list?, quality list?, quantity?, required?, atom?'
+
 
 				else 																# CREATE ROOT TEMPLATE
 					vars = input.get_vars 											# gather variables
@@ -466,14 +593,14 @@ class Oriana
 					# 	name => color list array
 					colors = { colors => @s.color_lists[ colors ] } 				# Set up special color Hash
 					qualities = { qualities => @s.quality_lists[ qualities ] } 		# set up special quality Hash
-					@root_id = @s.inventory.get_new_id 								# get a new ID
+					root_id = @s.inventory.get_new_id 								# get a new ID
 					# Add new Template to Inventory
-				 	@s.inventory << Template.new( name, @root_id, colors, qualities )
+				 	@s.inventory << Template.new( name, root_id, colors, qualities )
 
-					out.post @s.inventory.template_to_s @root_id 					# Post update
+					out.post @s.inventory.template_to_s root_id 					# Post update
 					# Post arugments
-					out.prompt 'parent(id), name, required?, color list?, quality list?, quantity?, atom?'
-					@console.in.insert '0', "#{@root_id} " 						 	# Insert parent id for speed
+					out.prompt 'parent, name, color list?, quality list?, quantity?, required?, atom?'
+					@console.in.insert '0', "#{root_id} " 						 	# Insert parent id for speed
 
 				end # template options
 

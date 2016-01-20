@@ -1,5 +1,5 @@
 require 'net/smtp'
-require_relative 'Constants'
+require_relative 'Utility'
 
 SECONDS_IN_DAY = 86400
 CUTOFF_TIME = 14
@@ -78,7 +78,7 @@ Subject: #{subject}
 #{content}
 END
 
-	smtp = Net::SMTP.start('mail.orthus.net', 26, 'localhost', 'orthus', '0rthu$Tech', :login)
+	smtp = Net::SMTP.start('gator3257.hostgator.com', 465, 'localhost', 'chad@orthus.net', '0rthu$Tech', :login)
 	smtp.send_message( message, @from, @to )
 	smtp.finish
 
@@ -88,7 +88,7 @@ END
 	private
 	def next_ship_date( date = Time.new )
 																						# Today is
-		if USPS::HOLIDAYS.include? date.to_s[/\d{4}\-\d\d\-\d\d/] or					# Holiday?
+		if C::HOLIDAYS.include? date.to_s[/\d{4}\-\d\d\-\d\d/] or					# Holiday?
 			(Time.new.day == date.day and date.hour > CUTOFF_TIME) or date.wday == 0	# After cut-off or Sunday?
 				next_ship_date( date + SECONDS_IN_DAY ) # Check tomorrow
 		else
@@ -98,8 +98,7 @@ END
 	end
 end
 
-email = Emailer.new('Kirby Miller', 'kmiller0184@yahoo.co')
 
-email.purchase_confirmation
-#email.aquisition_notice
-#email.completion_notice('9405509699939022751617')
+#Emailer.new('Derrick Chaitar', 'derrickchaitar@gmail.com').completion_notice('9405503699300137406859')
+Emailer.new('Adam Stevens', 'chad.bowman0@gmail.com').completion_notice('9405509699937122482103')
+

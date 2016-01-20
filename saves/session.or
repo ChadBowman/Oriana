@@ -7,6 +7,39 @@ color_lists:
   - Cobalt
   - Black
   - White
+  dsi: &10
+  - Black
+  - White
+  - Light Blue
+  dsi xl: &16
+  - Blue
+  - Burgundy
+  3ds: &23
+  - Aqua Blue
+  - Cosmo Black
+  - Flame Red
+  - Pearl Pink
+  - Ice White
+  - Cobalt Blue
+  - Midnight Purple
+  - Metallic Red
+  - Zelda
+  3ds xl: &30
+  - Blue
+  - Red
+  - Silver
+  - White
+  - Black
+  - Pink/White
+  - Super Mario Bros
+  - Pikachu
+  - Pokemon Red
+  - Pokemon Blue
+  - Zelda
+  - Mario & Luigi
+  b&w: &31
+  - Black
+  - White
 quality_lists:
   disabled: &4
   - n/a
@@ -21,9 +54,9 @@ inventory: !ruby/object:Inventory
     '1': !ruby/object:Template
       name: DS Lite
       id: '1'
-      availible_colors: &9
+      availible_colors: &8
         ds lite: *1
-      availible_qualities: &10
+      availible_qualities: &9
         standard: *2
       part_map:
         '2':
@@ -56,6 +89,9 @@ inventory: !ruby/object:Inventory
         '21':
         - true
         - false
+        '42':
+        - true
+        - false
       quantity_needed: 1
     '2': !ruby/object:Template
       name: Top LCD
@@ -71,8 +107,8 @@ inventory: !ruby/object:Inventory
       id: '3'
       availible_colors: &5
         disabled: *3
-      availible_qualities: &6
-        disabled: *4
+      availible_qualities:
+        standard: *2
       part_map:
         '4':
         - true
@@ -85,14 +121,16 @@ inventory: !ruby/object:Inventory
       name: Bottom LCD
       id: '4'
       availible_colors: *5
-      availible_qualities: *6
+      availible_qualities:
+        disabled: *4
       part_map: {}
       quantity_needed: 1
     '5': !ruby/object:Template
       name: Digitizer
       id: '5'
       availible_colors: *5
-      availible_qualities: *6
+      availible_qualities:
+        standard: *2
       part_map: {}
       quantity_needed: 1
     '6': !ruby/object:Template
@@ -125,9 +163,9 @@ inventory: !ruby/object:Inventory
     '9': !ruby/object:Template
       name: Mainboard
       id: '9'
-      availible_colors: &7
+      availible_colors: &6
         disabled: *3
-      availible_qualities: &8
+      availible_qualities: &7
         disabled: *4
       part_map:
         '10':
@@ -146,29 +184,29 @@ inventory: !ruby/object:Inventory
     '10': !ruby/object:Template
       name: Motherboard
       id: '10'
-      availible_colors: *7
-      availible_qualities: *8
+      availible_colors: *6
+      availible_qualities: *7
       part_map: {}
       quantity_needed: 1
     '11': !ruby/object:Template
       name: Game Slot
       id: '11'
-      availible_colors: *7
-      availible_qualities: *8
+      availible_colors: *6
+      availible_qualities: *7
       part_map: {}
       quantity_needed: 1
     '12': !ruby/object:Template
       name: Charge Port
       id: '12'
-      availible_colors: *7
-      availible_qualities: *8
+      availible_colors: *6
+      availible_qualities: *7
       part_map: {}
       quantity_needed: 1
     '13': !ruby/object:Template
       name: Power Switch
       id: '13'
-      availible_colors: *7
-      availible_qualities: *8
+      availible_colors: *6
+      availible_qualities: *7
       part_map: {}
       quantity_needed: 1
     '14': !ruby/object:Template
@@ -183,8 +221,8 @@ inventory: !ruby/object:Inventory
     '15': !ruby/object:Template
       name: Housing
       id: '15'
-      availible_colors: *9
-      availible_qualities: *10
+      availible_colors: *8
+      availible_qualities: *9
       part_map:
         '16':
         - true
@@ -202,29 +240,29 @@ inventory: !ruby/object:Inventory
     '16': !ruby/object:Template
       name: Screen Panel
       id: '16'
-      availible_colors: *9
-      availible_qualities: *10
+      availible_colors: *8
+      availible_qualities: *9
       part_map: {}
       quantity_needed: 1
     '17': !ruby/object:Template
       name: Top/Lower Panels
       id: '17'
-      availible_colors: *9
-      availible_qualities: *10
+      availible_colors: *8
+      availible_qualities: *9
       part_map: {}
       quantity_needed: 1
     '18': !ruby/object:Template
       name: Stylus
       id: '18'
-      availible_colors: *9
-      availible_qualities: *10
+      availible_colors: *8
+      availible_qualities: *9
       part_map: {}
       quantity_needed: 1
     '19': !ruby/object:Template
       name: Slot Cover
       id: '19'
-      availible_colors: *9
-      availible_qualities: *10
+      availible_colors: *8
+      availible_qualities: *9
       part_map: {}
       quantity_needed: 1
     '20': !ruby/object:Template
@@ -239,6 +277,1279 @@ inventory: !ruby/object:Inventory
     '21': !ruby/object:Template
       name: Charger
       id: '21'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '22': !ruby/object:Template
+      name: DSi
+      id: '22'
+      availible_colors: &12
+        dsi: *10
+      availible_qualities: &13
+        standard: *2
+      part_map:
+        '23':
+        - true
+        - false
+        '24':
+        - true
+        - false
+        '27':
+        - true
+        - false
+        '28':
+        - true
+        - false
+        '29':
+        - true
+        - false
+        '30':
+        - true
+        - false
+        '31':
+        - true
+        - false
+        '32':
+        - true
+        - false
+        '33':
+        - true
+        - false
+        '34':
+        - true
+        - false
+        '40':
+        - true
+        - true
+        '43':
+        - true
+        - false
+        '46':
+        - true
+        - false
+        '47':
+        - true
+        - false
+        '36':
+        - false
+        - false
+      quantity_needed: 1
+    '23': !ruby/object:Template
+      name: Top LCD
+      id: '23'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '24': !ruby/object:Template
+      name: Bottom Screen
+      id: '24'
+      availible_colors: &11
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map:
+        '25':
+        - true
+        - false
+        '26':
+        - true
+        - false
+      quantity_needed: 1
+    '25': !ruby/object:Template
+      name: Bottom LCD
+      id: '25'
+      availible_colors: *11
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '26': !ruby/object:Template
+      name: Digitizer
+      id: '26'
+      availible_colors: *11
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '27': !ruby/object:Template
+      name: Camera
+      id: '27'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '28': !ruby/object:Template
+      name: Antenna
+      id: '28'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '29': !ruby/object:Template
+      name: Microphone
+      id: '29'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '30': !ruby/object:Template
+      name: Speaker
+      id: '30'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 2
+    '31': !ruby/object:Template
+      name: Hinge Tensioner
+      id: '31'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '32': !ruby/object:Template
+      name: SD Slot
+      id: '32'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '33': !ruby/object:Template
+      name: Battery
+      id: '33'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '34': !ruby/object:Template
+      name: Housing
+      id: '34'
+      availible_colors: *12
+      availible_qualities: *13
+      part_map:
+        '35':
+        - true
+        - false
+        '37':
+        - true
+        - false
+        '38':
+        - true
+        - false
+        '18':
+        - true
+        - false
+      quantity_needed: 1
+    '35': !ruby/object:Template
+      name: Panels
+      id: '35'
+      availible_colors: *12
+      availible_qualities: *13
+      part_map: {}
+      quantity_needed: 1
+    '37': !ruby/object:Template
+      name: Battery Door
+      id: '37'
+      availible_colors: *12
+      availible_qualities: *13
+      part_map: {}
+      quantity_needed: 1
+    '38': !ruby/object:Template
+      name: Button Contacts
+      id: '38'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '40': !ruby/object:Template
+      name: Mainboard
+      id: '40'
+      availible_colors: &14
+        disabled: *3
+      availible_qualities: &15
+        disabled: *4
+      part_map:
+        '41':
+        - true
+        - false
+        '44':
+        - true
+        - false
+        '45':
+        - true
+        - false
+      quantity_needed: 1
+    '41': !ruby/object:Template
+      name: Motherboard
+      id: '41'
+      availible_colors: *14
+      availible_qualities: *15
+      part_map: {}
+      quantity_needed: 1
+    '42': !ruby/object:Template
+      name: Hinge Tensioner
+      id: '42'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '43': !ruby/object:Template
+      name: Sub Board
+      id: '43'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '44': !ruby/object:Template
+      name: Game Slot
+      id: '44'
+      availible_colors: *14
+      availible_qualities: *15
+      part_map: {}
+      quantity_needed: 1
+    '45': !ruby/object:Template
+      name: Charge Port
+      id: '45'
+      availible_colors: *14
+      availible_qualities: *15
+      part_map: {}
+      quantity_needed: 1
+    '46': !ruby/object:Template
+      name: Wifi Module
+      id: '46'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '47': !ruby/object:Template
+      name: Charger
+      id: '47'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '48': !ruby/object:Template
+      name: DSi XL
+      id: '48'
+      availible_colors: &19
+        dsi xl: *16
+      availible_qualities: &20
+        standard: *2
+      part_map:
+        '49':
+        - true
+        - false
+        '50':
+        - true
+        - false
+        '53':
+        - true
+        - false
+        '54':
+        - true
+        - false
+        '55':
+        - true
+        - false
+        '56':
+        - true
+        - false
+        '57':
+        - true
+        - false
+        '58':
+        - true
+        - false
+        '59':
+        - true
+        - false
+        '60':
+        - true
+        - false
+        '61':
+        - true
+        - false
+        '67':
+        - true
+        - true
+        '39':
+        - true
+        - false
+        '69':
+        - true
+        - false
+        '47':
+        - true
+        - false
+        '36':
+        - false
+        - false
+      quantity_needed: 1
+    '49': !ruby/object:Template
+      name: Top LCD
+      id: '49'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '50': !ruby/object:Template
+      name: Bottom Screen
+      id: '50'
+      availible_colors: &17
+        disabled: *3
+      availible_qualities: &18
+        standard: *2
+      part_map:
+        '51':
+        - true
+        - false
+        '52':
+        - true
+        - false
+      quantity_needed: 1
+    '51': !ruby/object:Template
+      name: Bottom LCD
+      id: '51'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '52': !ruby/object:Template
+      name: Digitizer
+      id: '52'
+      availible_colors: *17
+      availible_qualities: *18
+      part_map: {}
+      quantity_needed: 1
+    '53': !ruby/object:Template
+      name: Camera
+      id: '53'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '54': !ruby/object:Template
+      name: Antenna
+      id: '54'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '55': !ruby/object:Template
+      name: Microphone
+      id: '55'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '56': !ruby/object:Template
+      name: Speaker
+      id: '56'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 2
+    '57': !ruby/object:Template
+      name: Hinge Tensioner
+      id: '57'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '58': !ruby/object:Template
+      name: SD Slot
+      id: '58'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '59': !ruby/object:Template
+      name: Volume Switch
+      id: '59'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '60': !ruby/object:Template
+      name: Battery
+      id: '60'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '61': !ruby/object:Template
+      name: Housing
+      id: '61'
+      availible_colors: *19
+      availible_qualities: *20
+      part_map:
+        '62':
+        - true
+        - false
+        '64':
+        - true
+        - false
+        '65':
+        - true
+        - false
+        '66':
+        - true
+        - false
+      quantity_needed: 1
+    '62': !ruby/object:Template
+      name: Panels
+      id: '62'
+      availible_colors: *19
+      availible_qualities: *20
+      part_map: {}
+      quantity_needed: 1
+    '64': !ruby/object:Template
+      name: Battery Door
+      id: '64'
+      availible_colors: *19
+      availible_qualities: *20
+      part_map: {}
+      quantity_needed: 1
+    '65': !ruby/object:Template
+      name: Button Contacts
+      id: '65'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '66': !ruby/object:Template
+      name: Stylus
+      id: '66'
+      availible_colors: *19
+      availible_qualities: *20
+      part_map: {}
+      quantity_needed: 1
+    '67': !ruby/object:Template
+      name: Mainboard
+      id: '67'
+      availible_colors: &21
+        disabled: *3
+      availible_qualities: &22
+        disabled: *4
+      part_map:
+        '68':
+        - true
+        - false
+        '45':
+        - true
+        - false
+        '44':
+        - true
+        - false
+      quantity_needed: 1
+    '68': !ruby/object:Template
+      name: Motherboard
+      id: '68'
+      availible_colors: *21
+      availible_qualities: *22
+      part_map: {}
+      quantity_needed: 1
+    '39': !ruby/object:Template
+      name: Sub Board
+      id: '39'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '69': !ruby/object:Template
+      name: Wifi Module
+      id: '69'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '36': !ruby/object:Template
+      name: SD Card
+      id: '36'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '63': !ruby/object:Template
+      name: 3DS
+      id: '63'
+      availible_colors: &28
+        3ds: *23
+      availible_qualities: &29
+        standard: *2
+      part_map:
+        '70':
+        - true
+        - false
+        '71':
+        - true
+        - false
+        '74':
+        - true
+        - false
+        '75':
+        - true
+        - false
+        '77':
+        - true
+        - false
+        '78':
+        - true
+        - false
+        '81':
+        - true
+        - false
+        '82':
+        - true
+        - false
+        '83':
+        - true
+        - false
+        '84':
+        - true
+        - false
+        '85':
+        - true
+        - false
+        '86':
+        - true
+        - false
+        '87':
+        - true
+        - false
+        '88':
+        - true
+        - true
+        '92':
+        - true
+        - false
+        '93':
+        - true
+        - false
+        '94':
+        - true
+        - false
+        '95':
+        - true
+        - false
+        '47':
+        - true
+        - false
+        '101':
+        - false
+        - false
+        '36':
+        - false
+        - false
+      quantity_needed: 1
+    '70': !ruby/object:Template
+      name: Top LCD
+      id: '70'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '71': !ruby/object:Template
+      name: Bottom Screen
+      id: '71'
+      availible_colors: &24
+        disabled: *3
+      availible_qualities: &25
+        standard: *2
+      part_map:
+        '72':
+        - true
+        - false
+        '73':
+        - true
+        - false
+      quantity_needed: 1
+    '72': !ruby/object:Template
+      name: Bottom LCD
+      id: '72'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '73': !ruby/object:Template
+      name: Digitizer
+      id: '73'
+      availible_colors: *24
+      availible_qualities: *25
+      part_map: {}
+      quantity_needed: 1
+    '74': !ruby/object:Template
+      name: Microphone
+      id: '74'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '75': !ruby/object:Template
+      name: Antenna
+      id: '75'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '77': !ruby/object:Template
+      name: Camera
+      id: '77'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '78': !ruby/object:Template
+      name: 3D/Speaker Ribbon Cable
+      id: '78'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map:
+        '79':
+        - true
+        - false
+        '80':
+        - true
+        - false
+      quantity_needed: 1
+    '79': !ruby/object:Template
+      name: Speaker
+      id: '79'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 2
+    '80': !ruby/object:Template
+      name: 3D Switch
+      id: '80'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '81': !ruby/object:Template
+      name: Hinge Tensioner
+      id: '81'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '82': !ruby/object:Template
+      name: SD Slot
+      id: '82'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '83': !ruby/object:Template
+      name: Battery
+      id: '83'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '84': !ruby/object:Template
+      name: Volume Switch
+      id: '84'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '85': !ruby/object:Template
+      name: IR Module
+      id: '85'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '86': !ruby/object:Template
+      name: Wifi Module
+      id: '86'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '87': !ruby/object:Template
+      name: Analog Sensor
+      id: '87'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '88': !ruby/object:Template
+      name: Mainboard
+      id: '88'
+      availible_colors: &26
+        disabled: *3
+      availible_qualities: &27
+        disabled: *4
+      part_map:
+        '89':
+        - true
+        - false
+        '90':
+        - true
+        - false
+        '91':
+        - true
+        - false
+      quantity_needed: 1
+    '89': !ruby/object:Template
+      name: Motherboard
+      id: '89'
+      availible_colors: *26
+      availible_qualities: *27
+      part_map: {}
+      quantity_needed: 1
+    '90': !ruby/object:Template
+      name: Charge Port
+      id: '90'
+      availible_colors: *26
+      availible_qualities: *27
+      part_map: {}
+      quantity_needed: 1
+    '91': !ruby/object:Template
+      name: Game Slot
+      id: '91'
+      availible_colors: *26
+      availible_qualities: *27
+      part_map: {}
+      quantity_needed: 1
+    '92': !ruby/object:Template
+      name: Shoulder Left
+      id: '92'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '93': !ruby/object:Template
+      name: Shoulder Right
+      id: '93'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '94': !ruby/object:Template
+      name: Circle Pad
+      id: '94'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '95': !ruby/object:Template
+      name: Housing
+      id: '95'
+      availible_colors: *28
+      availible_qualities: *29
+      part_map:
+        '96':
+        - true
+        - false
+        '97':
+        - true
+        - false
+        '98':
+        - true
+        - false
+        '99':
+        - true
+        - false
+        '100':
+        - true
+        - false
+      quantity_needed: 1
+    '96': !ruby/object:Template
+      name: Button Panel
+      id: '96'
+      availible_colors: *28
+      availible_qualities: *29
+      part_map: {}
+      quantity_needed: 1
+    '97': !ruby/object:Template
+      name: Top/Bottom Panels
+      id: '97'
+      availible_colors: *28
+      availible_qualities: *29
+      part_map: {}
+      quantity_needed: 1
+    '98': !ruby/object:Template
+      name: Stylus
+      id: '98'
+      availible_colors: *28
+      availible_qualities: *29
+      part_map: {}
+      quantity_needed: 1
+    '99': !ruby/object:Template
+      name: Screen Cover
+      id: '99'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '100': !ruby/object:Template
+      name: Button Contacts
+      id: '100'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '101': !ruby/object:Template
+      name: Charge Dock
+      id: '101'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '76': !ruby/object:Template
+      name: 3DS XL
+      id: '76'
+      availible_colors: &38
+        3ds xl: *30
+      availible_qualities: &39
+        standard: *2
+      part_map:
+        '102':
+        - true
+        - true
+        '105':
+        - true
+        - false
+        '108':
+        - true
+        - false
+        '109':
+        - true
+        - false
+        '110':
+        - true
+        - false
+        '111':
+        - true
+        - false
+        '114':
+        - true
+        - false
+        '115':
+        - true
+        - false
+        '116':
+        - true
+        - false
+        '117':
+        - true
+        - false
+        '118':
+        - true
+        - false
+        '119':
+        - true
+        - false
+        '120':
+        - true
+        - true
+        '122':
+        - true
+        - false
+        '123':
+        - true
+        - false
+        '94':
+        - true
+        - false
+        '124':
+        - true
+        - false
+        '125':
+        - true
+        - false
+        '129':
+        - true
+        - false
+        '130':
+        - true
+        - false
+        '47':
+        - true
+        - false
+        '36':
+        - false
+        - false
+      quantity_needed: 1
+    '102': !ruby/object:Template
+      name: Top Screen
+      id: '102'
+      availible_colors: &32
+        b&w: *31
+      availible_qualities: &33
+        standard: *2
+      part_map:
+        '103':
+        - true
+        - false
+        '104':
+        - true
+        - false
+      quantity_needed: 1
+    '103': !ruby/object:Template
+      name: Top LCD
+      id: '103'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '104': !ruby/object:Template
+      name: Screen Cover
+      id: '104'
+      availible_colors: *32
+      availible_qualities: *33
+      part_map: {}
+      quantity_needed: 1
+    '105': !ruby/object:Template
+      name: Bottom Screen
+      id: '105'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map:
+        '106':
+        - true
+        - false
+        '107':
+        - true
+        - false
+      quantity_needed: 1
+    '106': !ruby/object:Template
+      name: Bottom LCD
+      id: '106'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '107': !ruby/object:Template
+      name: Digitizer
+      id: '107'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '108': !ruby/object:Template
+      name: Microphone
+      id: '108'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '109': !ruby/object:Template
+      name: Antenna
+      id: '109'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '110': !ruby/object:Template
+      name: Camera
+      id: '110'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '111': !ruby/object:Template
+      name: 3D/Speaker Ribbon Cable
+      id: '111'
+      availible_colors: &34
+        disabled: *3
+      availible_qualities: &35
+        disabled: *4
+      part_map:
+        '112':
+        - true
+        - false
+        '113':
+        - true
+        - false
+      quantity_needed: 1
+    '112': !ruby/object:Template
+      name: Speaker
+      id: '112'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 2
+    '113': !ruby/object:Template
+      name: 3D Switch
+      id: '113'
+      availible_colors: *34
+      availible_qualities: *35
+      part_map: {}
+      quantity_needed: 1
+    '114': !ruby/object:Template
+      name: Hinge Tensioner
+      id: '114'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '115': !ruby/object:Template
+      name: Battery
+      id: '115'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '116': !ruby/object:Template
+      name: Volume Switch
+      id: '116'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '117': !ruby/object:Template
+      name: IR Module
+      id: '117'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '118': !ruby/object:Template
+      name: Wifi Module
+      id: '118'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '119': !ruby/object:Template
+      name: Analog Sensor
+      id: '119'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '120': !ruby/object:Template
+      name: Mainboard
+      id: '120'
+      availible_colors: &36
+        disabled: *3
+      availible_qualities: &37
+        disabled: *4
+      part_map:
+        '121':
+        - true
+        - false
+        '90':
+        - true
+        - false
+        '91':
+        - true
+        - false
+      quantity_needed: 1
+    '121': !ruby/object:Template
+      name: Motherboard
+      id: '121'
+      availible_colors: *36
+      availible_qualities: *37
+      part_map: {}
+      quantity_needed: 1
+    '122': !ruby/object:Template
+      name: Shoulder Left
+      id: '122'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '123': !ruby/object:Template
+      name: Shoulder Right
+      id: '123'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '124': !ruby/object:Template
+      name: Button Contacts
+      id: '124'
+      availible_colors:
+        disabled: *3
+      availible_qualities:
+        standard: *2
+      part_map: {}
+      quantity_needed: 1
+    '125': !ruby/object:Template
+      name: Housing
+      id: '125'
+      availible_colors: *38
+      availible_qualities: *39
+      part_map:
+        '126':
+        - true
+        - false
+        '127':
+        - true
+        - false
+        '128':
+        - true
+        - false
+      quantity_needed: 1
+    '126': !ruby/object:Template
+      name: Top Panel
+      id: '126'
+      availible_colors: *38
+      availible_qualities: *39
+      part_map: {}
+      quantity_needed: 1
+    '127': !ruby/object:Template
+      name: Button Panel
+      id: '127'
+      availible_colors: *38
+      availible_qualities: *39
+      part_map: {}
+      quantity_needed: 1
+    '128': !ruby/object:Template
+      name: Bottom Panel
+      id: '128'
+      availible_colors: *38
+      availible_qualities: *39
+      part_map: {}
+      quantity_needed: 1
+    '129': !ruby/object:Template
+      name: Stylus
+      id: '129'
+      availible_colors:
+        3ds xl: *30
+      availible_qualities:
+        disabled: *4
+      part_map: {}
+      quantity_needed: 1
+    '130': !ruby/object:Template
+      name: Hinge Housing
+      id: '130'
       availible_colors:
         disabled: *3
       availible_qualities:

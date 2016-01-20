@@ -67,9 +67,10 @@ class Inventory
 	#
 	# Parameters:
 	# +id+:: ID of root template
+	# +details+:: whether or not to show color and quality list names
 	# +space+:: space to create heiarchy effect (used recursivly)
 	# +att+:: child attributes (used recursivly)
-	def template_to_s( id, space = '', att = '' )
+	def template_to_s( id, details = false, space = '', att = '' )
 
 		# snag ID if tempalte passed in
 		id = id.id if id.is_a? Template
@@ -85,8 +86,10 @@ class Inventory
 			quant = template.quantity_needed > 1 ? " (#{template.quantity_needed})" : ''
 			# show attributes
 			att = " [#{att}]" if att != ''
+			# show color/quality lists
+			deets = details ? " {#{template.get_color_list_name} | #{template.get_quality_list_name}}" : ''
 			# format line
-			str += "%s%3s|%s%s%s" % [space, id, template.name, quant, att]
+			str += "%s%3s|%s%s%s%s" % [space, id, template.name, quant, att, deets]
 			# add some space for intent
 			space += '  '
 
@@ -96,7 +99,7 @@ class Inventory
 				req = val[0] ? '' : 'N'
 				atm = val[1] ? 'A' : ''
 				# call method for each part in map
-				str += "\n%s" % template_to_s( key, space, req + atm )
+				str += "\n%s" % template_to_s( key, details, space, req + atm )
 			end
 		end
 
@@ -106,12 +109,15 @@ class Inventory
 	end # template_to_s
 
 	# Returns a string with the entire Template heiarchy
-	def templates_to_s
+	#
+	# Parameter:
+	# +details+:: whether or not to show color and quality lists
+	def templates_to_s( details = false )
 
 		# Concatenate all root string representations.
 		str = String.new
 		collect_roots.each do |root|
-			str += "#{template_to_s root.id}\n" 
+			str += "#{template_to_s root.id, details}\n" 
 		end
 		
 		# Return results without last newline
@@ -165,43 +171,12 @@ class Inventory
 				end
 			end
 
-		end
+		end # each template
 
 	end # update_color
 
-end
+end # Inventory
 
-module Sellable
-
-	attr_accessor   :list_category,					# Category ID
-					:list_catalog,					# Catalog ID
-					:list_price,					# Currently listed price
-					:list_quantity,					# Current quantity listed
-					:list_condition_description, 	# Small description on condition
-					:list_condition_id,				# Category-specific ID
-					:list_title,					# Listing title
-					:list_BO_accept,				# Best offer auto accept
-					:list_BO_minimum,				# Best offer minimum price allow
-					:list_dispatch_time,			# Dispatch time
-					:list_duration,					# List duration
-					:list_type,						# Auction or Fixed 
-					:list_date,						# Date first listed
-					:list_photos,					# Array? of photo URLs
-					:list_return_policy,			# Return policy (OBJECT)
-					:list_shipping_methods,			# Shipping Methods (OBJECT)
-					:list_price_history,			# Date-price hash
-					:sold_date,						# Date sold
-					:item_id						# Item ID assigned by Ebay
-					
-
-end
-
-module Buyable
-
-	attr_accessor	:purchase_date,					# Date purchased
-					:purchase_price					# Price of purchase (per unit)
-
-end
 
 class Template
 
@@ -209,7 +184,7 @@ class Template
 					:id, 							# Numeric, unique ID
 					:availible_colors, 				# Hash of Array of colors to choose from
 					:availible_qualities, 			# Hash of Array of qualities to chooose from
-					:quantity_needed,				# Quantity of parts in assembly
+					:quantity_needed,				# Quantity of parts in assembly i.e. 2 for speakers
 					:part_map						# Hash id => [required, atom] of other templates
 													# 	ID of child assembly
 													# 	If the child is required to sell
@@ -291,7 +266,7 @@ class Template
 		elsif @availible_qualities.values[0][ quality ].is_a? NilClass
 			raise ArgumentError, "#{quality} is not availible for #{@name} [#{@id}]"
 		else
-			assem = Assembly.new( @name, @id, @colors, @qualities, @map, color, quality )
+			Assembly.new( @name, @id, @colors, @qualities, @map, color, quality )
 		end
 		
 	end
@@ -307,7 +282,7 @@ class Assembly < Template
 					:color, 
 					:quality,
 					:parts,
-					:status				# Availible, Reserved, Listed, Sold
+					:status				# Availible, Reserved, Listed, Sold, Incomming, Repaired, Returned, Destoryed
 
 	def initialize( name, id, colors, qualities, map, color, quality )
 		super( name, id, colors, qualities, map )

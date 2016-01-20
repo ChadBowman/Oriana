@@ -30,6 +30,13 @@ module C
 		seller: Profile.new( false, 'AgAAAA**AQAAAA**aAAAAA**gzqAVQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GhDZiCoA6dj6x9nY+seQ**/mMDAA**AAMAAA**g8zWPzS6q0dMf0j0kt3VtE5wRbh0A6yhTP/xmS4PvGLZJpvgaTdteKRoS/c1aELoJXg+Z+83GW32PLCvS/WDEfu3gSs+cVR48cTw8ipS0J243zM1pbahGMP7IdIj7D5+auoDptcrqWCTBZbiGE5Efvb5MIiOYpmb97sI4WCelRMTGoachyE5U6sSj9nf79450iC8LNiaFAv6tC1Dk7UHzFTnoo10uj/8yQb8iu79k9Yki2Zhj1aKqF2eD+gjlkJqQUEhv5aifXe4mkFiz77xlCU82aOTne0nNjO1RNalZUCp3jylxL3blL6HyEm7SMy3IhQYt448DfoRhdejyBWU3fXNBhlTXiPxU4AJBan2lSJ5OPONrOGFop+1i9jPlGZxKPDhrkF3bbQ3/7iC7lUXGuucSaijs0Ud/OxEA9y+6VkabDtdhwk6M3YETscAf9797BZw5YzlEvEdmmQV3xDmC9gzEl/s8GkH0Yb4c2u0DPd+uf4DdqHY9fjuajElc2xjCWfWnCvWRHRNxKvJ4x6hwGWdTouVBlwHP+sPT0lnozu8B+QRWxAli6kECkYkErQyPk7hQvPOiV19LF9ur/gfFKYRnH0zHRsuvgN0uKT762yH6vyFaob8ePgbZACRwk+ioviS1mPlgriainvyk3Xwvu/aMXFG/scG7GXNOzfXUl2NQsR7z4Hw66jvB8Z4tGgspKF5zYx/kQ9fCTM56hou2MRR6WvrMfeOhzoOPF9mgudeSafQaw+PthKgEsCkpC87' )
 	}
 
+	HOLIDAYS = ['2015-05-25',
+			'2015-07-04',
+			'2015-09-07',
+			'2015-10-12',
+			'2015-11-11',
+			'2015-11-26',
+			'2015-12-25']
 
 end
 
@@ -95,5 +102,3 @@ class Session
 	end
 
 end
-
-

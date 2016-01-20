@@ -18,7 +18,7 @@ class Coin
 
 		case value
 		when Fixnum
-			@value = value										# No formatting needed
+			@value = value * 100								# No formatting needed
 
 		when Float
 			value < 0 ? value -= 0.005001 : value += 0.005001	# Round last penny
@@ -133,6 +133,12 @@ class Coin
 			end
 		end
 
-	end # to_s	
+	end # to_s
+
+	def to_dollar
+		
+		self.to_f[/\.../]
+
+	end
 
 end # Coin
