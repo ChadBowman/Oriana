@@ -27,19 +27,25 @@ class Discog
 	# * _Array_ - Hashie results.
 	def search( barcode )
 		
-		# Search for specfic matches first.
-		results = @wrapper.search( nil, barcode: barcode, type: :release )
+		if barcode =~ /\d+/
+			# Search for specfic matches first.
+			results = @wrapper.search( nil, barcode: barcode, type: :release )
+
+
+			# If specific search fails, go more broad
+			if results[:pagination][:items] == 0
+
+				results = @wrapper.search( barcode, type: :release )
+			end
+
+		else
+			results = @wrapper.search( barcode, type: :release )
+
+		end
 
 		# TODO make a more elegant fix for too many results.
 		# Throw error if results more than this search shows.
 		throw StandardError, 'Too many results!' if results[:pagination][:pages] > 1
-
-		# If specific search fails, go more broad
-		if results[:pagination][:items] == 0
-
-			results = @wrapper.search( barcode, type: :release )
-
-		end
 
 		# Return array of results.
 		results[:results]
@@ -57,5 +63,5 @@ class Discog
 end
 
 #OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
-#puts Discog.new.search('727361227616')
+#puts Discog.new.search('The replacements sorry ma, forgot to take out the trash')
 #puts Discog.new.get_release('7696080')

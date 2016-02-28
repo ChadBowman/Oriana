@@ -16,7 +16,6 @@ class Start < Control
 				File.read('../saves/init.or').each_line do |line|
 					if line.include? 'Last Save:'
 						@console.profile = Profile.load( line.sub('Last Save: ', '') )
-						@out.top @console.profile.name
 					end
 				end
 

@@ -111,6 +111,8 @@ END
 			'X-EBAY-API-COMPATIBILITY-LEVEL' => @trading_version,
 			'X-EBAY-API-DETAIL-LEVEL' => '0' }
 		
+		call_body.gsub!(/& /, '&amp; ')
+
 		# Post request and get response
 		XML.new @trade.post( @trade_uri.path, call_body, header ).body
 

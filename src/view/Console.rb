@@ -94,10 +94,10 @@ class Console
 		end
 
 		# Navigation binds
-		@input.bind('Right') { @out.next }
-		@input.bind('Left') { @out.previous }
-		@input.bind('Shift-Right') { @out.next_sub }
-		@input.bind('Shift-Left') { @out.previous_sub }
+		#@input.bind('PgDown') { @out.next_sub }
+		#@input.bind('Page-Up') { @out.previous_sub }
+		@input.bind('Shift-Right') { @out.next }
+		@input.bind('Shift-Left') { @out.previous }
 
 	end # initialize
 

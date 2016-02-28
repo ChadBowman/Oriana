@@ -27,15 +27,27 @@ class ListItem < Control
 			clear_binds
 
 			@vinyl = Vinyl.new
-			handle_flags input
-			@vinyl.upc = input.value[/ \d+ ?$/].gsub(/\s/, '')
+			@image_urls = Array.new
+			@shipping = ShippingOption.new
+			@shipping.service = ShippingOption::Services::MEDIA
+			@shipping.priority = 1
+			@shipping.weight_major = '2' 
+			@shipping.weight_minor = '0'
 
-			puts "UPC: #{@vinyl.upc}"
+			handle_flags input
+
+			search_term = input.value[/ \d+ ?$/]
+
+			if search_term.nil?
+				search_term = input.value[/\".*\"$/].gsub(/\"/, '')
+			else
+				search_term = search_term.gsub(/\s/, '')
+				@vinyl.upc = search_term
+			end
 
 			@out.thinking
-			results = @profile.discogs.search @vinyl.upc
+			results = @profile.discogs.search search_term
 			@out.done_thinking
-
 		
 			# More than one match found.
 			if results.size == 1
@@ -50,6 +62,7 @@ class ListItem < Control
 
 			else
 				@out.prompt "No release found!"
+				@vinyl = nil
 
 			end
 
@@ -63,7 +76,7 @@ class ListItem < Control
 		end # vinyl.nil?
 
 		# Reset entry
-		@entry.insert( 0, "#{input.value} " )
+		@entry.insert( 0, "list #{@vinyl.upc}" )
 		puts "Done in action"
 
 	end # action
@@ -101,8 +114,17 @@ class ListItem < Control
 				end
 
 			when :c
-				if value =~ /^(new|used)$/i
-					if value =~ /new/i 
+				if value =~ /^(new|used)$/i or value.nil?
+					if value.nil?
+
+						case @vinyl.condition_id
+						when Vinyl::NEW
+							@vinyl.condition_id = Vinyl::USED
+						when Vinyl::USED
+							@vinyl.condition_id = Vinyl::NEW
+						end
+
+					elsif value =~ /new/i 
 						@vinyl.condition_id = Vinyl::NEW
 					elsif value =~ /used/i
 						@vinyl.condition_id = Vinyl::USED
@@ -112,14 +134,36 @@ class ListItem < Control
 				end
 
 			when :t
-				if value.length < 81
+
+				if value.nil?
+					@entry.value = "#{value} -t #{@vinyl.title} "
+				elsif value.length < 81
 					@vinyl.title = value
+					@vinyl.title.gsub!(/\\-/, '-')
 				else
 					@out.prompt "Title can only be 80 characters long!"
 				end
 
+			when :w
+				if value =~ /^\d$/
+					value = Integer( value )
+
+					if value > 0 
+						@shipping.weight_major = value.to_s
+					else
+						@out.prompt 'Weight must be greater than 0!'
+					end
+				else
+					@out.prompt 'Quantity format wrong!'
+				end
+
 			when :d
 				@detailed_desc = value
+
+			when :i
+				@image_urls = value.split(/, ?/)
+				#upload_images
+
 			end
 
 		end
@@ -265,31 +309,15 @@ EOF
 		@vinyl.quantity = 1 if @vinyl.quantity.nil?
 		
 		# Larger images for listing
-		images = Array.new
-		imgs = ''
-		if false
-		
+		unless release[:images].nil?
+			
 			release[:images].each_with_index do |img, i|
-				#images << "Vinyl #{i+1}"
-				images << img[:uri]
-				puts "Added #{img[:uri]}"
+				@image_urls << img[:uri] if i < 12
 			end
-			
-			@out.prompt "Uploading images..."
-			responses = @profile.courier.upload_pictures images
-			@out.prompt "Upload complete..."
-
-			
-			responses.each_with_index do |xml, i|
-				imgs << "<PictureURL>#{xml['FullURL']}</PictureURL>" if i < 12
-			end
-
-		else
-			imgs = "<PictureURL>#{release[:images].first[:uri]}</PictureURL>"
 		end
 
-
-		@vinyl.picture_urls = imgs
+	
+		@vinyl.picture_urls = "<PictureURL>#{@image_urls.first}</PictureURL>"
 
 		# Listing specifics
 		@vinyl.list_duration = Ebay::GOOD_TIL_CANCELED
@@ -299,15 +327,31 @@ EOF
 		@vinyl.best_offer = true
 		@vinyl.description = description( @detailed_desc )
 
-		puts 'Binding list'
 		bind(1){ list }
-
-		puts 'Posting to display'
+		bind(2){ upload_images }
 		
 		@out.post_sub( sub_pane )
 		@out.post( display, @vinyl.image )
 
 	end # mold_vinyl
+
+	def upload_images
+	
+		
+		Thread.new{
+			@out.center "Uploading images..."
+			responses = @profile.courier.upload_pictures @image_urls
+			
+			@image_urls = Array.new
+			responses.each_with_index do |xml, i|
+				@image_urls << "<PictureURL>#{xml['FullURL']}</PictureURL>"
+			end
+
+			@vinyl.picture_urls = @image_urls
+			@out.center "Upload complete!"
+		}
+		
+	end
 
 	def list
 
@@ -324,21 +368,27 @@ EOF
 				specifics[:genre] = @vinyl.genre
 				specifics[:styles] = @vinyl.styles
 				specifics[:year] = @vinyl.year
+				specifics[:record_grading] = "Mint (M)" if @vinyl.condition_id = '1000'
+				specifics[:sleeve_grading] = "Mint (M)" if @vinyl.condition_id = '1000'
 				specifics.merge! @vinyl.special_attributes
 				vars[:specifics] = specifics
 				vars[:store_category1] = '4646348015'
+				vars[:store_category2] = '4527246015' if @vinyl.genre == 'Rock'
 
 				# Return Policy/ Shipping
 				vars[:return_policy] = ReturnPolicy.new.to_XML
 
-				s = ShippingOption.new
-				s.service = 'USPSMedia'
-				s.priority = 1
-				s.cost = '4'
-				s.weight_major = '2'
-				s.weight_minor = '0'
-				vars[:shipping_options] = s.to_XML
 
+				priority = ShippingOption.new
+				priority.priority = 2
+				priority.service = ShippingOption::Services::PRIORITY
+
+				international = ShippingOption.new
+				international.priority = 3
+				international.region = ShippingOption::INTERNATIONAL
+				international.service = ShippingOption::Services::FIRST_CLASS_INT
+
+				vars[:shipping_options] = @shipping.to_XML(priority, international)
 				
 				@out.thinking
 				result = @profile.courier.add_item vars
@@ -347,6 +397,7 @@ EOF
 				@out.center result['Ack']
 				puts result
 				@vinyl = nil
+				@image_urls = nil
 				@entry.set 'list '
 				#TODO save vinyl somewhere? SQL maybe?
 		
@@ -369,12 +420,32 @@ EOF
 		condition = 'Used' if @vinyl.condition_id == Vinyl::USED
 		country = "#{@vinyl.country}, #{@vinyl.year}"
 
+		ats = Array.new
 		unless @vinyl.special_attributes.empty?
-			ats = "Attributes:\n"
-
+			ats << "Attributes:"
 			@vinyl.special_attributes.each_value do |value|
-				ats << "      #{value}\n"
-			end
+					ats << "      #{value}"
+				end
+		end
+
+
+		@vinyl.artists = ['unkown'] if @vinyl.artists.nil?
+
+		col = 34
+		lines = Array.new
+		lines << "%-#{col}s Price:     %s" % [@vinyl.artists.first, @vinyl.price]
+		lines << "%-#{col}s Quantity:  %s" % [@vinyl.album, @vinyl.quantity]
+		lines << "%-#{col}s %-30s Weight: %s" % [country, '', @shipping.weight_major + "lbs"]
+		lines << "%-#{col}s Condition: %s" % [@vinyl.genre, condition]
+		lines << "%-#{col}s Description:" % ''
+		lines << "%-#{col}s %s" % [ats[0], '']
+		lines << "%-#{col}s %s" % [ats[1], '']
+		lines << "%-#{col}s %s" % [ats[2], '']
+		tab = '    '
+
+		text = String.new
+		lines.each do |l|
+			text << "#{tab}#{l}\n"
 		end
 
 <<-EOF
@@ -382,29 +453,15 @@ EOF
 	#{@vinyl.title}		
 
 
-	#{"%-40sPrice:     %s" % [@vinyl.artists.first, @vinyl.price]}
-	#{"%-40sQuantity:  %s" % [@vinyl.album, @vinyl.quantity]}
-	#{"%-40sCondition: %s" % [country, condition]}
-	#{"%-40s" % @vinyl.genre}
-
-	#{ats}
-	[F1] List
-	[F12] Cancel
+#{text}
 EOF
 	end
 
 	def sub_pane
 <<-EOF
-
-
-
-
-	--- Options --- 
-  -p Price
-  -q Quantity
-  -c Condition
-  -t Title
-  -d Description
+  [F1] List
+  [F2] Upload #{@image_urls.size} Images
+  [F12] Cancel
 EOF
 	end
 
@@ -417,6 +474,12 @@ EOF
 			jacket_code = 'M'
 			vinyl_desc = 'Brand new!'
 			jacket_desc = "Brand new!"
+
+		elsif @vinyl.condition_id == Vinyl::USED
+			vinyl_code = 'NM'
+			jacket_code = 'VG'
+			vinyl_desc = 'Looks great!'
+			jacket_desc = 'Great considering its age!'
 		end
 
 		# Append artists
@@ -452,7 +515,7 @@ EOF
 				file.sub!("{desc}", '')
 			else
 				file.sub!("{itm}", 'Item Description:')
-				file.sub!("{desc}", desc)
+				file.sub!("{desc}", desc + '<br>')
 			end
 
 			if jacket_desc.nil?
@@ -467,7 +530,7 @@ EOF
 				file.sub!("{vinyl_desc}", vinyl_desc)
 			end
 
-
+			file.gsub!(/ & /, '&amp;')
 			"<![CDATA[#{file}]]>"
 
 		rescue Exception => e

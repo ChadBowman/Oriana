@@ -54,16 +54,13 @@ class Vinyl < Item
 
 			when 'Vinyl', 'CD'
 
-				puts "Format nil? #{@format.nil?}"
 				if @format.nil?
 					@format = key
 				else
 					@format = "#{@format} #{key}"
-					puts "Added #{@format}"
 				end
 
 				ats.delete key
-				puts "Leaving switch"
 
 			when "7\"", "10\""
 				@size = key
@@ -110,7 +107,6 @@ class Vinyl < Item
 
 	def make_title
 
-		puts "Making title"
 		artist = @artists.first.upcase
 
 		front = "#{artist} #{@album} "
@@ -129,14 +125,15 @@ class Vinyl < Item
 
 		@attributes.each do |at|
 
+			at = at.sub(/ Edition/i, '') if at.include? 'Edition'
+			at = at.sub('gram', 'g')
+
 			front = front + "#{at} "
 
 			title = front + back if (front + back).length < 81
 				
 		end
 		
-		puts "Title Made"
-
 		title 
 	end # make_title
 
@@ -160,7 +157,7 @@ class Vinyl < Item
 
 	def color
 		@attributes.each do |at|
-			if at =~ /(red|blue|green|purple|yellow|orange|white|black|clear|transparent|translucent|pink)(.*vinyl)?/i
+			if at =~ /((^| )red|blue|green|purple|yellow|orange|white|black|clear|transparent|translucent|pink|gold|silver)/i
 				return at
 			end
 		end

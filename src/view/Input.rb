@@ -43,6 +43,8 @@ class Input
 			value = false if value.downcase == 'no' or value.downcase == 'false'
 
 			value.chop! if value[-1] =~ /\s/
+			value = nil if value == ''
+
 			flags[ key.to_sym ] = value unless key.nil?
 			
 		end		

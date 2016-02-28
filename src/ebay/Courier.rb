@@ -310,6 +310,18 @@ class Courier
 				specs << "<Name>Release Year</Name><Value>#{x[:year]}</Value>"
 			end
 
+			unless x[:record_grading].nil?
+				specs << "<Name>Record Grading</Name><Value>#{x[:record_grading]}</Value>}"
+			end
+
+			unless x[:sleeve_grading].nil?
+				specs << "<Name>Sleeve Grading</Name><Value>#{x[:sleeve_grading]}</Value>}"
+			end
+
+			unless x[:speed]
+				
+			end
+
 			special = Array.new
 			special << "<Value>180 - 220 gram</Value>" unless x[:heavy].nil?
 			special << "<Value>Picture Disc</Value>" unless x[:picture].nil?
