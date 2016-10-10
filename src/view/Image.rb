@@ -1,13 +1,19 @@
 require 'mini_magick'
 require 'tk'
+require 'securerandom'
 
 class Image < MiniMagick::Image
 
 	attr_reader :uri
 
 	def initialize( path )
+
 		if path =~ /http/
-			super MiniMagick::Image.open( path ).path
+			img = MiniMagick::Image.open path
+			new_path = "../temp/#{SecureRandom.uuid}.#{img.type.downcase}"
+			img.write new_path
+			super new_path
+			puts "New path " + self.path
 			@uri = path
 			
 		else
@@ -20,7 +26,7 @@ class Image < MiniMagick::Image
 	def fmt() @format end
 
 	def to_gif
-		ret = MiniMagick::Image.open self.path
+		ret = MiniMagick::Image.new self.path
 		ret.format 'gif'
 		Image.new ret.path
 	end
@@ -57,5 +63,5 @@ end
 #require 'openssl'
 #OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
-#i = Image.new 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Khajuraho-Lakshmana_temple.JPG'
+#i = Image.new 'https://www.organicfacts.net/wp-content/uploads/2013/05/watermelon2.jpg'
 #puts i.path

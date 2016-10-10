@@ -45,7 +45,7 @@ class Discog
 
 		# TODO make a more elegant fix for too many results.
 		# Throw error if results more than this search shows.
-		throw StandardError, 'Too many results!' if results[:pagination][:pages] > 1
+		#throw StandardError, 'Too many results!' if results[:pagination][:pages] > 1
 
 		# Return array of results.
 		results[:results]

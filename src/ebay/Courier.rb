@@ -43,6 +43,8 @@ class Courier
 
 	end
 
+	
+
 	def fetch_token( session_id )
 		
 		call = 'FetchToken'

@@ -1,5 +1,6 @@
 
 
+require 'green_shoes'
 require_relative 'Control'
 require_relative '../view/Image'
 require_relative '../cactus/Vinyl'
@@ -16,23 +17,31 @@ class ListItem < Control
 
 	def action( input )
 
-		if input.value =~ /^list$/
-			@vinyl = nil
-		end
+		flag = true
 		
 		puts "Vinyl nil? #{@vinyl.nil?}"
 		
 		# vinyl nil only when new listing is being made
 		if @vinyl.nil?
 			clear_binds
+			add_images_manually = false
 
 			@vinyl = Vinyl.new
+			@vinyl.upc = 'NA'
 			@image_urls = Array.new
 			@shipping = ShippingOption.new
 			@shipping.service = ShippingOption::Services::MEDIA
 			@shipping.priority = 1
 			@shipping.weight_major = '2' 
 			@shipping.weight_minor = '0'
+
+			@vinyl_con =  Vinyl::DEFAULT_VINYL_CONDITION
+			@vinyl_des =  Vinyl::DEFAULT_VINYL_DESCRIPTION
+			@jacket_con = Vinyl::DEFAULT_JACKET_CONDITION
+			@jacket_des = Vinyl::DEFAULT_JACKET_DESCRIPTION
+
+			@vinyl.list_type = Ebay::FIXED
+			@vinyl.list_duration = Ebay::GOOD_TIL_CANCELED
 
 			handle_flags input
 
@@ -68,34 +77,38 @@ class ListItem < Control
 
 		else # vinyl.nil?
 
-			handle_flags input
-			puts 'Posting to display'
+			flag = handle_flags input
+
 			@out.post_sub( sub_pane )
 			@out.post( display, @vinyl.image )
+
+			unless @vinyl.image.nil?
+				if @vinyl.image.dimensions.first < 500
+					@out.prompt "Image must be at least 500px wide!"
+				end
+			end
 
 		end # vinyl.nil?
 
 		# Reset entry
-		@entry.insert( 0, "list #{@vinyl.upc}" )
-		puts "Done in action"
+		@entry.insert( 0, "list #{@vinyl.upc} " ) if flag and !@vinyl.nil?
 
 	end # action
 
 	def handle_flags( input )
 		
-		puts "Checking flags"
 		# Remove 'list ' and the UPC
-		flags = input.get_flags( /(list | \d{5,} ?)/ )
-		puts "Flags checked: #{flags.size}"
+		flags = input.get_flags( /(list | \d{5,} ?$|\".*\"$)/ )
+		puts flags.to_s
 
 		flags.each do |key, value|
-			puts "Handling flag #{key}"
-
+			
 			case key
 			when :p 
 				begin
 					@vinyl.price = Coin.new( value ).to_f
 					@vinyl.best_offer_decline = Coin.new( @vinyl.price * 0.75 ).to_f
+
 				rescue Exception => e
 					@out.prompt "Invalid price format!"
 				end
@@ -135,13 +148,25 @@ class ListItem < Control
 
 			when :t
 
-				if value.nil?
-					@entry.value = "#{value} -t #{@vinyl.title} "
+				if value == 't'
+					@entry.insert(0, "list -t #{@vinyl.title.gsub(/\-/, "\\-")}")
+					return false
+
 				elsif value.length < 81
 					@vinyl.title = value
 					@vinyl.title.gsub!(/\\-/, '-')
+
 				else
-					@out.prompt "Title can only be 80 characters long!"
+					@vinyl.title = value.gsub!(/\\-/, '-')
+
+					if value =~ /##/
+						@vinyl.title = @vinyl.make_title_end( @vinyl.title )
+					end
+
+					if @vinyl.title.length > 80
+						@out.prompt "Title can only be 80 characters long!"
+					end
+
 				end
 
 			when :w
@@ -154,22 +179,57 @@ class ListItem < Control
 						@out.prompt 'Weight must be greater than 0!'
 					end
 				else
-					@out.prompt 'Quantity format wrong!'
+					@out.prompt 'Weight format wrong!'
 				end
 
 			when :d
 				@detailed_desc = value
 
+			when :v
+				# Separate code from description
+				@vinyl_con = value[/^\S+\s/]
+				@vinyl_con.sub!(/\s$/, '')
+				@vinyl_des = value[/\s.*$/]
+				@vinyl_des.sub!(/^\s/, '')
+
+			when :j
+				# Separate code from description
+				@jacket_con = value[/^\S+\s/]
+				@jacket_con.sub!(/ \s$/, '')
+				@jacket_des = value[/\s.*$/]
+				@jacket_des.sub!(/^\s/, '')
+
 			when :i
-				@image_urls = value.split(/, ?/)
-				#upload_images
+				if value == 'i'
+					result = ask_open_file
+					@image_urls = result if add_images_manually == false 
+					@image_urls << result if add_images_manually == true
+					
+					add_images_manually = true
+				else
+					@image_urls = value.split(/, ?/)
+				end
 
-			end
+			when :l
+				if value =~ /auction/i
+					@vinyl.list_type = Ebay::AUCTION
+					@vinyl.list_duration = Ebay::DAYS_7
 
-		end
+					if '10' =~ /\d*$/
+						@vinyl.list_duration = Ebay::DAYS_10
+					end
 
-		puts "Leaving flags"
-	end
+				elsif value =~ /fixed/i
+
+					@vinyl.list_type = Ebay::FIXED
+				
+				end
+
+			end # switch
+
+		end # flags.each
+
+	end # handle_flags
 
 	def compare_countries( array )
 		
@@ -255,10 +315,12 @@ EOF
 		clear_binds
 		all.each_with_index do |info, i|
 			t << "      [F#{i+1}] #{info}\n"
-
-			bind(i+1) do
-				puts "Molding vinyl"
-				mold_vinyl releases[i][:id]
+			
+			if i < 12
+				bind(i+1) do
+					puts "Molding vinyl"
+					mold_vinyl releases[i][:id]
+				end
 			end
 
 		end
@@ -276,9 +338,9 @@ EOF
 	def mold_vinyl( release_id )
 
 		@out.thinking
-
 		# Retrieve release from Discogs
 		release = @profile.discogs.get_release release_id
+		@out.done_thinking
 	
 		# Simplify artists
 		artists = Array.new
@@ -288,7 +350,6 @@ EOF
 		@vinyl.artists = artists
 
 		# Get specifics from release
-		@vinyl.category = Cactus::EBAY_VINYL_CATEGORY
 		@vinyl.discogs_id = release_id
 
 		if release.title == @vinyl.artists.first
@@ -315,20 +376,18 @@ EOF
 				@image_urls << img[:uri] if i < 12
 			end
 		end
-
 	
 		@vinyl.picture_urls = "<PictureURL>#{@image_urls.first}</PictureURL>"
 
 		# Listing specifics
-		@vinyl.list_duration = Ebay::GOOD_TIL_CANCELED
 		@vinyl.dispatch_time = 1
 		@vinyl.condition_id = Vinyl::NEW if @vinyl.condition_id.nil?
-		@vinyl.list_type = Ebay::FIXED
 		@vinyl.best_offer = true
-		@vinyl.description = description( @detailed_desc )
+		#@vinyl.description = description( @detailed_desc, @vinyl_con, @jacket_con, @vinyl_des, @jacket_con )
 
 		bind(1){ list }
 		bind(2){ upload_images }
+		bind(12){ @vinyl = nil }
 		
 		@out.post_sub( sub_pane )
 		@out.post( display, @vinyl.image )
@@ -336,7 +395,6 @@ EOF
 	end # mold_vinyl
 
 	def upload_images
-	
 		
 		Thread.new{
 			@out.center "Uploading images..."
@@ -355,6 +413,10 @@ EOF
 
 	def list
 
+		puts "Listing #{@vinyl.title}..."
+
+		@vinyl.description = description( @detailed_desc, @vinyl_con, @jacket_con, @vinyl_des, @jacket_des )
+
 		if @profile.ready?
 			vars = @vinyl.get_var_hash.merge @profile.ebay
 
@@ -362,18 +424,66 @@ EOF
 				@out.prompt "A price is required!"
 			else
 
+				# Listing category and 
+				if @vinyl.format =~ /Vinyl/
+					vars[:category] = Cactus::EBAY_VINYL_CATEGORY
+					vars[:store_category1] = Cactus::VINYL
+
+				elsif @vinyl.format == Vinyl::CD
+					vars[:category] = Cactus::EBAY_CD_CATEGORY
+					vars[:store_category1] = Cactus::CDS
+				end
+
 				specifics = Hash.new
 				specifics[:size] = @vinyl.size
 				specifics[:duration] = @vinyl.duration
 				specifics[:genre] = @vinyl.genre
 				specifics[:styles] = @vinyl.styles
 				specifics[:year] = @vinyl.year
-				specifics[:record_grading] = "Mint (M)" if @vinyl.condition_id = '1000'
-				specifics[:sleeve_grading] = "Mint (M)" if @vinyl.condition_id = '1000'
+
+				if @vinyl_con.nil?
+					case @vinyl.condition_id
+
+					when Vinyl::NEW
+						specifics[:record_grading] = "Mint (M)"
+
+					when Vinyl::USED
+						specifics[:record_grading] = "Very Good Plus (VG+)"
+					end
+				else
+					specifics[:record_grading] = @vinyl_con
+				end
+
+				if @vinyl_des.nil?
+					case @vinyl.condition_id
+					when Vinyl::NEW
+						specifics[:sleeve_grading] = "Mint (M)"
+
+					when Vinyl::USED
+						specifics[:sleeve_grading] = "Very Good (VG)"
+
+					end
+				else
+					specifics[:sleeve_grading] = @jacket_con
+				end
+
 				specifics.merge! @vinyl.special_attributes
 				vars[:specifics] = specifics
-				vars[:store_category1] = '4646348015'
-				vars[:store_category2] = '4527246015' if @vinyl.genre == 'Rock'
+
+				case @vinyl.genre
+				when 'Rock'
+					vars[:store_category2] = Cactus::ROCK
+				when 'Jazz'
+					vars[:store_category2] = Cactus::JAZZ
+				when 'Country'
+					vars[:store_category2] = Cactus::COUNTRY
+				when 'Hip Hop'
+					vars[:store_category2] = Cactus::HIPHOP
+				when 'Electronic'
+					vars[:store_category2] = Cactus::ELECTRONIC
+				else
+					puts "Genere #{@vinyl.genre} not categorized in ebay store!"
+				end
 
 				# Return Policy/ Shipping
 				vars[:return_policy] = ReturnPolicy.new.to_XML
@@ -395,13 +505,14 @@ EOF
 				@out.done_thinking
 
 				@out.center result['Ack']
-				puts result
+
+				puts result if result['Ack'] != "Success"
+
 				@vinyl = nil
 				@image_urls = nil
 				@entry.set 'list '
 				#TODO save vinyl somewhere? SQL maybe?
 		
-
 			end
 
 		else
@@ -425,22 +536,21 @@ EOF
 			ats << "Attributes:"
 			@vinyl.special_attributes.each_value do |value|
 					ats << "      #{value}"
-				end
+			end
 		end
-
 
 		@vinyl.artists = ['unkown'] if @vinyl.artists.nil?
 
 		col = 34
 		lines = Array.new
-		lines << "%-#{col}s Price:     %s" % [@vinyl.artists.first, @vinyl.price]
-		lines << "%-#{col}s Quantity:  %s" % [@vinyl.album, @vinyl.quantity]
-		lines << "%-#{col}s %-30s Weight: %s" % [country, '', @shipping.weight_major + "lbs"]
-		lines << "%-#{col}s Condition: %s" % [@vinyl.genre, condition]
-		lines << "%-#{col}s Description:" % ''
-		lines << "%-#{col}s %s" % [ats[0], '']
-		lines << "%-#{col}s %s" % [ats[1], '']
-		lines << "%-#{col}s %s" % [ats[2], '']
+		lines << "%-#{col}s Price:       %s" % [@vinyl.artists.first, @vinyl.price]
+		lines << "%-#{col}s Quantity:    %s" % [@vinyl.album, @vinyl.quantity]
+		lines << "%-#{col}s %-28s Weight: %s" % [country, '', @shipping.weight_major + "lbs"]
+		lines << "%-#{col}s Condition:   %s" % [@vinyl.genre, condition]
+		lines << "%-#{col}s Description: %s" % ["Format: #{@vinyl.format}", @detailed_desc]
+		lines << "%-#{col}s Vinyl:  %s" % [ats[0], "#{@vinyl_con} #{@vinyl_des}"]
+		lines << "%-#{col}s Jacket: %s" % [ats[1], "#{@jacket_con} #{@jacket_des}"]
+		lines << "%-#{col}s Listing: %s" % [ats[2], "#{@vinyl.list_type}, #{@vinyl.list_duration}"]
 		tab = '    '
 
 		text = String.new
@@ -469,18 +579,21 @@ EOF
 			vinyl_desc = nil, jacket_desc = nil )
 
 		# Defaults
-		if @vinyl.condition_id == Vinyl::NEW
-			vinyl_code = 'M'
-			jacket_code = 'M'
-			vinyl_desc = 'Brand new!'
-			jacket_desc = "Brand new!"
-
-		elsif @vinyl.condition_id == Vinyl::USED
+		if @vinyl.condition_id == Vinyl::USED and vinyl_code == Vinyl::DEFAULT_VINYL_CONDITION
 			vinyl_code = 'NM'
 			jacket_code = 'VG'
-			vinyl_desc = 'Looks great!'
+			vinyl_desc = 'Looks and plays great!'
 			jacket_desc = 'Great considering its age!'
+
+			if desc.nil?
+				desc = "Photos in listing may not be of actual product."
+			else
+				desc += "\n Photos in listing may not be of actual product."
+			end
 		end
+		
+
+
 
 		# Append artists
 		if @vinyl.artists.size == 1
@@ -501,21 +614,34 @@ EOF
 			
 			file = File.read 'cactus/description.html'
 
-
 			file.sub!("{artist}", artist)
 			file.sub!("{album}", @vinyl.album)
 			file.sub!("{jacket_code}", jacket_code)
 			file.sub!("{vinyl_code}", vinyl_code)
-			
-			file.sub!("{duration}", @vinyl.duration) unless @vinyl.duration.nil?
+			file.gsub!("{format}", @vinyl.format)
 
+			if @vinyl.format == Vinyl::CD
+				file.sub!("{container}", "Case")
+			else
+				file.sub!("{container}", "Jacket")
+			end
+
+			if @vinyl.duration.nil?
+				if @vinyl.format == Vinyl::VINYL
+					file.sub!("{duration}", 'Record')
+				else
+					file.sub!("{duration}", '')
+				end
+			else
+				file.sub!("{duration}", @vinyl.duration)
+			end
 
 			if desc.nil?
 				file.sub!("{itm}", '')
 				file.sub!("{desc}", '')
 			else
 				file.sub!("{itm}", 'Item Description:')
-				file.sub!("{desc}", desc + '<br>')
+				file.sub!("{desc}", desc + '<br><br>')
 			end
 
 			if jacket_desc.nil?

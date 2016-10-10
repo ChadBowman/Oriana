@@ -21,6 +21,9 @@ class Input
 	# +remove+:: Regexp of stuff to remove from argument
 	def get_flags( remove = nil )
 
+		# escape dashes for split
+		@value.gsub!(/\\\-/, "<dash>")
+
 		# Remove command, split by spaces
 		if remove.nil?
 			vars = @value.split '-'
@@ -36,7 +39,7 @@ class Input
 		
 			# Extract key and value
 			key = str[/^\S+/]
-			value = str.sub( /^\S+ /, '' )
+			value = str.sub(/^\S+ /, '' ).gsub("<dash>", '-')
 
 			# parse true/false values
 			value = true if value.downcase == 'yes' or value.downcase == 'true'

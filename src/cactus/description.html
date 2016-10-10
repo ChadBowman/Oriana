@@ -116,7 +116,7 @@ a:visited {
 <table class="tableStyle" border="0" cellpadding="10" cellspacing="0" width="100%">
 <tbody><tr>
 <td colspan="2" class="tableHeader"><font color="#dce9d6" face="verdana, sans-serif"><span style="font-size: 30px;"><b>{artist}</b></span></font><br><hr class="headerHR">
-<p><font color="#dce9d6" face="verdana, sans-serif"><span style="font-size: 20px;"><b>{album}</b></span></font><br><font color="#dce9d6" face="verdana, sans-serif"><span style="font-size: 12px;">Vinyl {duration}</span></font></p></td>
+<p><font color="#dce9d6" face="verdana, sans-serif"><span style="font-size: 20px;"><b>{album}</b></span></font><br><font color="#dce9d6" face="verdana, sans-serif"><span style="font-size: 12px;">{format} {duration}</span></font></p></td>
 </tr>
 <tr>
 <td class="indentLeft" valign="top" width="100%">
@@ -125,10 +125,10 @@ a:visited {
 </p>
 <font color="#003300" face="verdana, sans-serif"><span style="font-size: 12px;">{desc}</span></font>
 <p class="bodyTitle">
-Jacket Condition: {jacket_code}</p>
+{container} Condition: {jacket_code}</p>
 <p class="bodyData">{jacket_desc}</p>
 <p class="bodyTitle">
-Vinyl Condition: {vinyl_code}</p>
+{format} Condition: {vinyl_code}</p>
 <p class="bodyData">{vinyl_desc}</p>
 <hr>
 <p class="bodyTitle">

@@ -63,7 +63,7 @@ class TextManager < Tk::Text
 	# +text+:: text to place at prompt location. Newlines are repalced with space.
 	def prompt( text )
 		text.gsub!("\n", ' ')
-		replace( "#{@lines}.0", "#{@lines}.120", text )
+		replace( "#{@lines}.0", "#{@lines}.end", text )
 	end
 
 	def prompt_right( text )
@@ -97,9 +97,15 @@ class TextManager < Tk::Text
 			if image.fmt == 'gif'
 				TkTextImage.new( self, 'img.first', image: image.to_tk )
 			else
-				im = image.to_gif
-				im = im.to_tk
-				TkTextImage.new( self, 'img.first', image: im )
+				begin
+					im = image.to_gif
+					im = im.to_tk
+					TkTextImage.new( self, 'img.first', image: im )
+					
+				rescue Exception => e
+					puts "File not found! #{image.path}"
+				end
+
 			end
 		end
 	end

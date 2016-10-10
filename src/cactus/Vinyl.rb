@@ -9,6 +9,14 @@ class Vinyl < Item
 	NEW = '1000'
 	USED = '3000'
 
+	DEFAULT_VINYL_CONDITION = 'M'
+	DEFAULT_JACKET_CONDITION = 'M'
+	DEFAULT_VINYL_DESCRIPTION = 'Brand New!'
+	DEFAULT_JACKET_DESCRIPTION = 'Brand New!'
+
+	VINYL = 'Vinyl'
+	CD = 'CD'
+
 	attr_accessor :discogs_id, :format, :size, :duration, :genre, :styles,
 		:album, :artists, :year, :country, :attributes, :genres, :image
 
@@ -52,7 +60,7 @@ class Vinyl < Item
 				@duration = key unless @duration == 'Box Set'
 				ats.delete key
 
-			when 'Vinyl', 'CD'
+			when VINYL, CD
 
 				if @format.nil?
 					@format = key
@@ -107,10 +115,14 @@ class Vinyl < Item
 
 	def make_title
 
-		artist = @artists.first.upcase
+	
+		make_title_end("#{@artists.first.upcase} #{@album} ").gsub('  ', ' ')
 
-		front = "#{artist} #{@album} "
 
+	end # make_title
+
+	def make_title_end( front )
+		
 		if @format == 'Vinyl'
 			back = "#{@size} Vinyl #{@duration}"
 		elsif @duration.nil?
@@ -126,7 +138,7 @@ class Vinyl < Item
 		@attributes.each do |at|
 
 			at = at.sub(/ Edition/i, '') if at.include? 'Edition'
-			at = at.sub('gram', 'g')
+			at = at.sub(/ ?gram/i, 'g')
 
 			front = front + "#{at} "
 
@@ -135,7 +147,8 @@ class Vinyl < Item
 		end
 		
 		title 
-	end # make_title
+
+	end
 
 	private
 	def check( regexp )

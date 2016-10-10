@@ -21,6 +21,9 @@ module Ebay
 
 	GOOD_TIL_CANCELED = 'GTC'
 	FIXED = 'FixedPriceItem'
+	AUCTION = 'Chinese'
+	DAYS_7 = 'Days_7'
+	DAYS_10 = 'Days_10'
 end
 
 module Cactus
@@ -28,6 +31,13 @@ module Cactus
 	EBAY_VINYL_CATEGORY = '176985'
 	EBAY_CD_CATEGORY = '176984'
 
+	VINYL = '4646348015'
+	CDS =   '4646347015'
+	ROCK = '4527246015'
+	COUNTRY = '4527247015'
+	JAZZ = '4528456015'
+	HIPHOP = '4527257015'
+	ELECTRONIC = '4527259015'
 end
 
 module Orthus

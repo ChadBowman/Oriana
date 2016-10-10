@@ -21,3 +21,4 @@ console.add_command ListItem.new
 console.add_command Start.new
 
 console.start
+
