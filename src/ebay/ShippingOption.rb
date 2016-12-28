@@ -117,6 +117,7 @@ class ShippingOption
 
 		<<-END
 		<ShippingDetails>
+			<GlobalShipping>true</GlobalShipping>
 			<ShippingType>#{@type}</ShippingType>
 			#{details}
  		</ShippingDetails>

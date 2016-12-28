@@ -38,6 +38,7 @@ module Cactus
 	JAZZ = '4528456015'
 	HIPHOP = '4527257015'
 	ELECTRONIC = '4527259015'
+	POP = '10858862015'
 end
 
 module Orthus

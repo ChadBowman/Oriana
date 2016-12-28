@@ -6,7 +6,6 @@ require 'openssl'
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 
-require_relative 'utility/Constants'
 require_relative 'view/Console'
 require_relative 'model/Profile'
 Dir['control/*'].each{ |file| require_relative file }
@@ -22,3 +21,9 @@ console.add_command Start.new
 
 console.start
 
+# Known bugs
+# changing title stalls program.. maybe only when using the "/" character
+# errors when discogs has no image avail
+# random crashes
+# use warbler to make the executable .jar
+# change size

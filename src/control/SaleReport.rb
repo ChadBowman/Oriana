@@ -51,4 +51,4 @@ class SaleReport
 
 end
 
-SaleReport.new('D:\Desktop\sold.csv', 'D:\Desktop\active.csv')
+#SaleReport.new('D:\Desktop\sold.csv', 'D:\Desktop\active.csv')

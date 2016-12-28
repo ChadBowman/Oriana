@@ -198,15 +198,16 @@ class Courier
 
 	def upload_pictures( photos )
 		
-		responses = Array.new
-
-		photos.each do |path|
+		responses = Array.new #Hash.new
+		
+		photos.each_with_index do |path, i|
+		
 			path = Image.new( path ).path if path =~ /http/
 			responses.push @caller.upload_picture( "name", path )
+			
 		end
 
-
-		if responses.is_a? NilClass
+		if responses.empty?
 			nil
 		elsif responses.size == 1
 			responses.first

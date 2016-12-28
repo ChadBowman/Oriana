@@ -1,6 +1,6 @@
 
 
-require 'green_shoes'
+require 'tk'
 require_relative 'Control'
 require_relative '../view/Image'
 require_relative '../cactus/Vinyl'
@@ -11,6 +11,7 @@ require_relative '../utility/XML'
 
 class ListItem < Control
 
+
 	def initialize
 		super( /list / )	
 	end
@@ -19,11 +20,13 @@ class ListItem < Control
 
 		flag = true
 		
-		puts "Vinyl nil? #{@vinyl.nil?}"
-		
+		@prompts = Array.new
+
 		# vinyl nil only when new listing is being made
 		if @vinyl.nil?
-			clear_binds
+			clear_binds 					# remove previous F-actions
+
+			# INITIAL STATE VALUES
 			add_images_manually = false
 
 			@vinyl = Vinyl.new
@@ -42,6 +45,8 @@ class ListItem < Control
 
 			@vinyl.list_type = Ebay::FIXED
 			@vinyl.list_duration = Ebay::GOOD_TIL_CANCELED
+
+			@detailed_desc = ""
 
 			handle_flags input
 
@@ -171,7 +176,7 @@ class ListItem < Control
 
 			when :w
 				if value =~ /^\d$/
-					value = Integer( value )
+					value = Integer( value ) 
 
 					if value > 0 
 						@shipping.weight_major = value.to_s
@@ -201,13 +206,9 @@ class ListItem < Control
 
 			when :i
 				if value == 'i'
-					result = ask_open_file
-					@image_urls = result if add_images_manually == false 
-					@image_urls << result if add_images_manually == true
-					
-					add_images_manually = true
+					@image_urls << Tk.getOpenFile('multiple' => true).split(' ')
 				else
-					@image_urls = value.split(/, ?/)
+					@image_urls << value.split(/, ?/)
 				end
 
 			when :l
@@ -215,14 +216,21 @@ class ListItem < Control
 					@vinyl.list_type = Ebay::AUCTION
 					@vinyl.list_duration = Ebay::DAYS_7
 
-					if '10' =~ /\d*$/
-						@vinyl.list_duration = Ebay::DAYS_10
-					end
+					#if '10' =~ /\d*$/
+					#	@vinyl.list_duration = Ebay::DAYS_10
+					#end
 
 				elsif value =~ /fixed/i
 
 					@vinyl.list_type = Ebay::FIXED
 				
+				end
+
+			when :upc
+				if value =~ /^\d+$/
+					@vinyl.upc = value
+				else
+					@promps << 'Invalid UPC format'
 				end
 
 			end # switch
@@ -252,25 +260,28 @@ class ListItem < Control
 			i = 1
 			stack.each_key do |country|
 
-				t << "      [F#{i}] #{country}\n"
-				
-				bind i do
-					# new array with less elements
-					new_arr = Array.new
-					array.each do |record|
-						new_arr << record if record[:country] == country
-					end
+				if i < 13
+					t << "      [F#{i}] #{country}\n"
 					
-					if new_arr.size == 1
-						puts "Molding vinyl"
-						mold_vinyl new_arr.first[:id]
+					bind i do
+						# new array with less elements
+						new_arr = Array.new
+						array.each do |record|
+							new_arr << record if record[:country] == country
+						end
+						
+						if new_arr.size == 1
+							puts "Molding vinyl"
+							mold_vinyl new_arr.first[:id]
 
-					else
-						puts "Selection not down to 1! #{new_arr.size}"
-						compare_features new_arr
-					end
+						else
+							puts "Selection not down to 1! #{new_arr.size}"
+							compare_features new_arr
+						end
 
-				end # do
+					end # do
+					
+				end # if
 
 				i += 1
 
@@ -375,6 +386,12 @@ EOF
 			release[:images].each_with_index do |img, i|
 				@image_urls << img[:uri] if i < 12
 			end
+
+			size = release[:images].first[:width]
+
+			if size < 500
+				@out.prompt "Image must be at least 500px wide!"
+			end
 		end
 	
 		@vinyl.picture_urls = "<PictureURL>#{@image_urls.first}</PictureURL>"
@@ -396,18 +413,19 @@ EOF
 
 	def upload_images
 		
-		Thread.new{
-			@out.center "Uploading images..."
-			responses = @profile.courier.upload_pictures @image_urls
-			
-			@image_urls = Array.new
-			responses.each_with_index do |xml, i|
-				@image_urls << "<PictureURL>#{xml['FullURL']}</PictureURL>"
-			end
+		@out.prompt "Uploading...\n"
+		responses = @profile.courier.upload_pictures @image_urls
+		
+		@image_urls = Array.new
 
-			@vinyl.picture_urls = @image_urls
-			@out.center "Upload complete!"
-		}
+		responses.each do |xml|
+			
+			@image_urls << "<PictureURL>#{xml['FullURL']}</PictureURL>"
+			
+		end
+
+		@vinyl.picture_urls = @image_urls
+		@out.prompt "Upload complete!\n"
 		
 	end
 
@@ -429,9 +447,11 @@ EOF
 					vars[:category] = Cactus::EBAY_VINYL_CATEGORY
 					vars[:store_category1] = Cactus::VINYL
 
-				elsif @vinyl.format == Vinyl::CD
+				elsif @vinyl.format =~ /CD/
 					vars[:category] = Cactus::EBAY_CD_CATEGORY
 					vars[:store_category1] = Cactus::CDS
+				else
+					vars[:category] = Cactus::EBAY_VINYL_CATEGORY
 				end
 
 				specifics = Hash.new
@@ -481,6 +501,8 @@ EOF
 					vars[:store_category2] = Cactus::HIPHOP
 				when 'Electronic'
 					vars[:store_category2] = Cactus::ELECTRONIC
+				when 'Pop'
+					vars[:store_category2] = Cactus::POP
 				else
 					puts "Genere #{@vinyl.genre} not categorized in ebay store!"
 				end
@@ -504,9 +526,15 @@ EOF
 				result = @profile.courier.add_item vars
 				@out.done_thinking
 
-				@out.center result['Ack']
+				
 
-				puts result if result['Ack'] != "Success"
+				if result['Ack'] != "Success"
+					puts result
+					@out.center result['Ack']
+				else
+					@out.center "#{@vinyl.title} Listing #{result['Ack']}" # prefered prompt
+				end
+
 
 				@vinyl = nil
 				@image_urls = nil

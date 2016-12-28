@@ -123,7 +123,7 @@ class Vinyl < Item
 
 	def make_title_end( front )
 		
-		if @format == 'Vinyl'
+		if @format.eql? VINYL
 			back = "#{@size} Vinyl #{@duration}"
 		elsif @duration.nil?
 			back = "#{@format}"
@@ -134,6 +134,11 @@ class Vinyl < Item
 		
 		title = front + back
 
+		n = 1
+		while title.length > 80
+			title = front[0...front.length-n] + back
+			n += 1
+		end
 
 		@attributes.each do |at|
 
