@@ -23,7 +23,7 @@ class Console
 	# +title+:: title of window
 	# +initial_text+:: text to display upon startup
 	def initialize( 
-		title = 'Console', initial_text = '', height = 25, width = 100 )
+		title = 'Console', initial_text = '', width = 0, height = 0 )
 
 		# Create hash for prompts
 		@commands = Array.new
@@ -35,6 +35,17 @@ class Console
 
 		# Root pane
 		@root = Tk::Root.new { title title }
+		w = TkWinfo.screenwidth @root
+		h = TkWinfo.screenheight @root
+		
+		if width == 0 or height == 0
+			width = (w * 0.099).to_i
+			height = (h * 0.0365).to_i
+		end
+
+
+		@root.geometry "#{w-5}x#{h-120}+0+40"
+		@root.iconphoto(TkPhotoImage.new('file' => 'orthus/icon.gif'))
 
 		# Text window output
 		@out = TextManager.new( @root, height, width, 0.8 ) do 
@@ -54,10 +65,6 @@ class Console
 			pack( side: 'bottom', fill: 'x' )
 			focus
 		end
-
-		# Centers window
-		# TODO make this work for any window size
-		@root.geometry '+150+60'
 
 		# Stack of call history
 		history = Array.new

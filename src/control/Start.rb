@@ -9,11 +9,11 @@ class Start < Control
 
 	def action
 		
-		if File.exist?( '../saves/init.or' )
+		if File.exist?( 'saves/init.or' )
 		
 			begin
 				
-				File.read('../saves/init.or').each_line do |line|
+				File.read('saves/init.or').each_line do |line|
 					if line.include? 'Last Save:'
 						@console.profile = Profile.load( line.sub('Last Save: ', '') )
 					end

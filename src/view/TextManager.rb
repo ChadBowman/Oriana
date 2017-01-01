@@ -21,7 +21,7 @@ class TextManager < Tk::Text
 		# Number of lines
 		@lines = lines
 		@characters = characters
-
+		
 		# Character to draw boundary at
 		@bound = Integer( boundary * characters )
 
