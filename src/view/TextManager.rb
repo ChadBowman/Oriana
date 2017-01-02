@@ -88,6 +88,14 @@ class TextManager < Tk::Text
 	# +text+:: text to replace on the Main pane.
 	def post( text, image = nil )
 
+		if text.class.eql? Array
+			text = String.new
+			
+			text.each do |line|
+				text << "#{line}\n"
+			end
+		end
+
 		replace( '2.0', "#{@lines - 1}.end", 
 			@main_pane.post( text ).join( @sub_pane.current_page, !image.nil? ) )
 

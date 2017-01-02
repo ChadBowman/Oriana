@@ -7,7 +7,7 @@ class FetchToken < Control
 
 
 	def initialize
-		super( /(fetch|get) token/ )
+		super( /^(fetch|get) token/ )
 
 		@url = "https://signin.ebay.com/ws/eBayISAPI.dll?SignIn&RuName=#{Orthus::RUNAME}&SessID="
 	end

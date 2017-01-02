@@ -33,7 +33,7 @@ class Input
 
 		# Hash to return
 		flags = Hash.new
-		# for each pair of arugments, place in Hash
+		# for each pair of arguments, place in Hash
 		# 	flags[ flag ] = argument
 		vars.each do |str|
 		

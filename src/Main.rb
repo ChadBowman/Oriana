@@ -11,7 +11,7 @@ OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 	Dir['control/*'].each{ |file| require_relative file }
 
 	File.new('../saves/log.txt', 'w')
-	Logger.write "test"
+
 	dims = [0, 0]
 
 	File.read('../saves/init.or').each_line do |line|
@@ -28,6 +28,7 @@ OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 	console.add_command CreateProfile.new
 	console.add_command FetchToken.new
 	console.add_command ListItem.new
+	console.add_command Help.new
 	console.add_command Start.new
 
 	console.start

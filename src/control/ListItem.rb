@@ -13,7 +13,7 @@ class ListItem < Control
 
 
 	def initialize
-		super( /list / )	
+		super( /^list / )	
 	end
 
 	def action( input )

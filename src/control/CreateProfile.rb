@@ -7,7 +7,7 @@ class CreateProfile < Control
 
 
 	def initialize
-		super( /create profile/ )
+		super( /^create profile/ )
 	end
 
 	def action( input )
