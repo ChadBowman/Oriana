@@ -1,3 +1,3 @@
 @echo off
-cd Oriana/src
+cd src
 ruby Main.rb
