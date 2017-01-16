@@ -49,7 +49,7 @@ class SaveLoad < Control
 				
 				# Load in profile
 				@console.profile = profs.first
-				@out.prompt "#{profs.first.name} loaded."
+				@out.top "#{profs.first.name}"
 
 			# More than 1 profile
 			else

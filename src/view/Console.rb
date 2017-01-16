@@ -39,12 +39,11 @@ class Console
 		h = TkWinfo.screenheight @root
 		
 		if width == 0 or height == 0
-			width = (w * 0.099).to_i
-			height = (h * 0.0365).to_i
+			width = (w * 0.0765).to_i
+			height = (h * 0.0315).to_i
 		end
-
-
-		@root.geometry "#{w-5}x#{h-120}+0+40"
+		
+		@root.geometry "#{w-5}x#{h-120}+0+30"
 		@root.iconphoto(TkPhotoImage.new('file' => 'orthus/icon.gif'))
 
 		# Text window output
@@ -54,7 +53,6 @@ class Console
 			width width
 			pack
 		end
-
 
 		# Print the splash page
 		@out.splash initial_text

@@ -37,24 +37,37 @@ class TextManager < Tk::Text
 
 		@wheel = Thread.new do
 			while true
-				prompt_right ' >.< '
-				sleep 0.2
-				prompt_right '.< >.'
-				sleep 0.2
+				prompt ''
+				sleep 0.3
+				prompt '..'
+				sleep 0.3
+				prompt '....'
+				sleep 0.3
+				prompt '......'
+				sleep 0.3
+				prompt '....'
+				sleep 0.3
+				prompt '..'
+				sleep 0.3
 			end
 		end
 	end
 
 	def done_thinking
 		@wheel.kill
-		prompt_right '     '
+		prompt ''
 	end
 
 
 	##### POST CONTENT
 	def top( text )
 		text.gsub!("\n", ' ')
-		replace( '1.0', '1.120', text )
+
+		while text.length < @characters
+			text = text + ' '
+		end
+
+		replace( '1.0', '1.end', text)
 	end
 
 	# Posts text on very bottom of output
@@ -63,7 +76,7 @@ class TextManager < Tk::Text
 	# +text+:: text to place at prompt location. Newlines are repalced with space.
 	def prompt( text )
 		text.gsub!("\n", ' ')
-		replace( "#{@lines}.0", "#{@lines}.end", text )
+		replace( "#{@lines-1}.end", "#{@lines}.end", text )
 	end
 
 	def prompt_right( text )
@@ -88,6 +101,7 @@ class TextManager < Tk::Text
 	# +text+:: text to replace on the Main pane.
 	def post( text, image = nil )
 
+
 		if text.class.eql? Array
 			text = String.new
 			
@@ -99,7 +113,7 @@ class TextManager < Tk::Text
 		replace( '2.0', "#{@lines - 1}.end", 
 			@main_pane.post( text ).join( @sub_pane.current_page, !image.nil? ) )
 
-		unless image.nil?
+		if image.class.eql? Image
 
 			add_tag('img', '5.10')
 			if image.fmt == 'gif'

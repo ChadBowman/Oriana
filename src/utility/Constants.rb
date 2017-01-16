@@ -7,13 +7,13 @@ module Oriana
 	VERSION = '1.0'
 
 	WELCOME = <<-END 
-			Orthus Technology
-		 _____   ______ _____ _______ __   _ _______
-		|     | |_____/   |   |_____| | \\  | |_____|
-		|_____| |    \\_ __|__ |     | |  \\_| |     |
-						
-   	        			         Version: #{VERSION}
-		END
+				Orthus Technology
+			 _____   ______ _____ _______ __   _ _______
+			|     | |_____/   |   |_____| | \\  | |_____|
+			|_____| |    \\_ __|__ |     | |  \\_| |     |
+							
+   	    	    			         Version: #{VERSION}
+END
 
 end
 
@@ -24,6 +24,7 @@ module Ebay
 	AUCTION = 'Chinese'
 	DAYS_7 = 'Days_7'
 	DAYS_10 = 'Days_10'
+	DAYS_5 = 'Days_5'
 end
 
 module Cactus
@@ -39,6 +40,7 @@ module Cactus
 	HIPHOP = '4527257015'
 	ELECTRONIC = '4527259015'
 	POP = '10858862015'
+	BLUES = '4528457015'
 end
 
 module Orthus

@@ -10,7 +10,7 @@ require_relative 'src/Coin'
 require_relative 'src/Utility'
 
 # Parent Class for ORIANA
-class Oriana
+class Orthus
 
 	# Call this class method to start the program
 	def self.start

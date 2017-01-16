@@ -26,6 +26,14 @@ class ListItem < Control
 		if @vinyl.nil?
 			clear_binds 					# remove previous F-actions
 
+			bind 12 do
+				@vinyl = nil
+				@image_urls = nil
+				@out.post ""
+				@out.splash Oriana::WELCOME
+				@entry.insert ""
+			end
+
 			# INITIAL STATE VALUES
 			add_images_manually = false
 
@@ -86,12 +94,6 @@ class ListItem < Control
 
 			@out.post_sub( sub_pane )
 			@out.post( display, @vinyl.image )
-
-			unless @vinyl.image.nil?
-				if @vinyl.image.dimensions.first < 500
-					@out.prompt "Image must be at least 500px wide!"
-				end
-			end
 
 		end # vinyl.nil?
 
@@ -200,25 +202,36 @@ class ListItem < Control
 			when :j
 				# Separate code from description
 				@jacket_con = value[/^\S+\s/]
-				@jacket_con.sub!(/ \s$/, '')
+				@jacket_con.sub!(/\s$/, '')
 				@jacket_des = value[/\s.*$/]
 				@jacket_des.sub!(/^\s/, '')
 
 			when :i
+				
+				unless add_images_manually
+					@image_urls = Array.new
+					add_images_manually = true
+				end
+
 				if value == 'i'
-					@image_urls << Tk.getOpenFile('multiple' => true).split(' ')
+					@image_urls << Tk.getOpenFile()
+					puts @image_urls
 				else
 					@image_urls << value.split(/, ?/)
 				end
+
 
 			when :l
 				if value =~ /auction/i
 					@vinyl.list_type = Ebay::AUCTION
 					@vinyl.list_duration = Ebay::DAYS_7
 
-					#if '10' =~ /\d*$/
-					#	@vinyl.list_duration = Ebay::DAYS_10
-					#end
+					if value =~ /10/
+						@vinyl.list_duration = Ebay::DAYS_10
+
+					elsif value =~ /5/
+						@vinyl.list_duration = Ebay::DAYS_5
+					end
 
 				elsif value =~ /fixed/i
 
@@ -260,7 +273,7 @@ class ListItem < Control
 			i = 1
 			stack.each_key do |country|
 
-				if i < 13
+				if i < 12
 					t << "      [F#{i}] #{country}\n"
 					
 					bind i do
@@ -387,10 +400,14 @@ EOF
 				@image_urls << img[:uri] if i < 12
 			end
 
+			size_check = false
 			size = release[:images].first[:width]
+			release[:images].each do |img|
+				size_check = true if img[:width] < 500
+			end
 
-			if size < 500
-				@out.prompt "Image must be at least 500px wide!"
+			if size_check
+				@out.prompt "Discogs stock images are not greater than 500px!"
 			end
 		end
 	
@@ -402,9 +419,9 @@ EOF
 		@vinyl.best_offer = true
 		#@vinyl.description = description( @detailed_desc, @vinyl_con, @jacket_con, @vinyl_des, @jacket_con )
 
+
 		bind(1){ list }
 		bind(2){ upload_images }
-		bind(12){ @vinyl = nil }
 		
 		@out.post_sub( sub_pane )
 		@out.post( display, @vinyl.image )
@@ -412,20 +429,19 @@ EOF
 	end # mold_vinyl
 
 	def upload_images
-		
-		@out.prompt "Uploading...\n"
-		responses = @profile.courier.upload_pictures @image_urls
-		
-		@image_urls = Array.new
 
-		responses.each do |xml|
-			
-			@image_urls << "<PictureURL>#{xml['FullURL']}</PictureURL>"
-			
-		end
+		Thread.new {
+			@out.prompt "    Uploading..."
+			responses = @profile.courier.upload_pictures @image_urls
+			@image_urls = Array.new
 
-		@vinyl.picture_urls = @image_urls
-		@out.prompt "Upload complete!\n"
+			responses.each do |xml|
+				@image_urls << "<PictureURL>#{xml['FullURL']}</PictureURL>"
+			end
+			
+			@vinyl.picture_urls = @image_urls
+			@out.prompt "    Upload complete!"
+		}
 		
 	end
 
@@ -463,7 +479,6 @@ EOF
 
 				if @vinyl_con.nil?
 					case @vinyl.condition_id
-
 					when Vinyl::NEW
 						specifics[:record_grading] = "Mint (M)"
 
@@ -503,8 +518,10 @@ EOF
 					vars[:store_category2] = Cactus::ELECTRONIC
 				when 'Pop'
 					vars[:store_category2] = Cactus::POP
+				when 'Blues'
+					vars[:store_category2] = Cactus::BLUES
 				else
-					puts "Genere #{@vinyl.genre} not categorized in ebay store!"
+					puts "Genre #{@vinyl.genre} not categorized in Ebay store!"
 				end
 
 				# Return Policy/ Shipping
@@ -515,31 +532,31 @@ EOF
 				priority.priority = 2
 				priority.service = ShippingOption::Services::PRIORITY
 
+				# International shipping DISABLED
 				international = ShippingOption.new
 				international.priority = 3
 				international.region = ShippingOption::INTERNATIONAL
 				international.service = ShippingOption::Services::FIRST_CLASS_INT
 
-				vars[:shipping_options] = @shipping.to_XML(priority, international)
+				vars[:shipping_options] = @shipping.to_XML(priority)#, international)
 				
 				@out.thinking
 				result = @profile.courier.add_item vars
 				@out.done_thinking
-
 				
 
 				if result['Ack'] != "Success"
 					puts result
 					@out.center result['Ack']
 				else
-					@out.center "#{@vinyl.title} Listing #{result['Ack']}" # prefered prompt
+					@out.center "Listing #{result['Ack']}" # preferred prompt
+					puts result
 				end
 
 
 				@vinyl = nil
 				@image_urls = nil
 				@entry.set 'list '
-				#TODO save vinyl somewhere? SQL maybe?
 		
 			end
 
@@ -567,7 +584,15 @@ EOF
 			end
 		end
 
-		@vinyl.artists = ['unkown'] if @vinyl.artists.nil?
+		@vinyl.artists = ['unknown'] if @vinyl.artists.nil?
+
+		list_type = (@vinyl.list_type =~ /Fixed/)? 'Fixed' : 'Auction'
+
+		if @vinyl.list_duration.eql? 'GTC'
+			list_dur = 'Good Til Canceled'
+		else
+			list_dur = "#{@vinyl.list_duration.sub(/\D*/, '')} days"
+		end
 
 		col = 34
 		lines = Array.new
@@ -576,11 +601,12 @@ EOF
 		lines << "%-#{col}s %-28s Weight: %s" % [country, '', @shipping.weight_major + "lbs"]
 		lines << "%-#{col}s Condition:   %s" % [@vinyl.genre, condition]
 		lines << "%-#{col}s Description: %s" % ["Format: #{@vinyl.format}", @detailed_desc]
-		lines << "%-#{col}s Vinyl:  %s" % [ats[0], "#{@vinyl_con} #{@vinyl_des}"]
-		lines << "%-#{col}s Jacket: %s" % [ats[1], "#{@jacket_con} #{@jacket_des}"]
-		lines << "%-#{col}s Listing: %s" % [ats[2], "#{@vinyl.list_type}, #{@vinyl.list_duration}"]
+		lines << "%-#{col}s Vinyl:  %s" % ["", "#{@vinyl_con} #{@vinyl_des}"]
+		lines << "%-#{col}s Jacket: %s" % [ats[0], "#{@jacket_con} #{@jacket_des}"]
+		lines << "%-#{col}s Listing: %s" % [ats[1], "#{list_type}, #{list_dur}"]
+		lines << "%-#{col}s %s" % [ats[2], ""]
+		
 		tab = '    '
-
 		text = String.new
 		lines.each do |l|
 			text << "#{tab}#{l}\n"
@@ -600,6 +626,18 @@ EOF
   [F1] List
   [F2] Upload #{@image_urls.size} Images
   [F12] Cancel
+
+  -p Price
+  -q quantity
+  -c condition
+  -t title
+  -w weight
+  -d description
+  -v vinyl condition
+  -j jacket condition
+  -l listing type
+  -upc item UPC
+  -i images
 EOF
 	end
 
@@ -620,7 +658,6 @@ EOF
 			end
 		end
 		
-
 
 
 		# Append artists

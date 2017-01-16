@@ -26,9 +26,9 @@ class Input
 
 		# Remove command, split by spaces
 		if remove.nil?
-			vars = @value.split '-'
+			vars = @value.split(/\s-/)
 		else
-			vars = @value.gsub( remove, '' ).split '-'
+			vars = @value.gsub( remove, '' ).split(/\s-/)
 		end
 
 		# Hash to return
@@ -73,6 +73,7 @@ class Input
 		vars.map! do |element|
 			# Replace underscores
 			element.gsub!('_', ' ')
+		
 			# Parse true/false values
 			if element.include? 'yes' or element.include? 'true'
 				element = true
