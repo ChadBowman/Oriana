@@ -1,3 +1,3 @@
 @echo off
 cd src
-ruby Main.rb
+ruby Oriana.rb
