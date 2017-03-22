@@ -1,25 +1,22 @@
 # Author::    Chad Bowman (mailto:chad.bowman0@gmail.com)
 # Copyright:: Copyright (c) 2015 Orthus Technology
 # License::   Distributes under the same terms as Ruby
-
 require 'openssl'
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 require_relative 'view/Console'
 require_relative 'model/Profile'
 require_relative 'utility/Logger'
-Dir['control/*'].each{ |file| require_relative file }
-
+Dir.glob('src/control/*').each do |file|
+    require_relative file[/control\/.*/]
+end
 #File.new('../saves/log.txt', 'w')
 #Logger.write "test"
-
+dir = Dir.pwd[/.*Oriana/]
 dims = [0, 0]
 
-File.read('../saves/init.or').each_line do |line|
-
-	if line.include? 'Dimensions'
-		dims = line.sub('Dimensions: ', '').split ' '
-	end
+File.read("#{dir}/src/saves/init.or").each_line do |line|
+    dims = line.sub('Dimensions: ', '').split(' ') if line.include? 'Dimensions'
 end
 
 console = Console.new( 'ORIANA', Oriana::WELCOME, dims.first.to_i, dims.last.to_i )
@@ -32,18 +29,17 @@ console.add_command Help.new
 console.add_command Start.new
 
 begin
-	t = Thread.new do
-	Dir.foreach("../temp/") do |f|
-		fn = File.join("../temp/", f)
-		File.delete(fn) if f != '.' && f != '..'
-	end
-end
+    t = Thread.new do
+        Dir.foreach("#{dir}/temp/") do |f|
+            fn = File.join("#{dir}/temp/", f)
+            File.delete(fn) if (f != '.' && f != '..')
+        end
+    end
 t.join
 
 rescue Exception => e
-	puts e
+    puts e
 end
-
 
 console.start
 

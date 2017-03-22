@@ -7,12 +7,12 @@ module Oriana
 	VERSION = '1.0'
 
 	WELCOME = <<-END 
-				Orthus Technology
-			 _____   ______ _____ _______ __   _ _______
-			|     | |_____/   |   |_____| | \\  | |_____|
-			|_____| |    \\_ __|__ |     | |  \\_| |     |
-							
-   	    	    			         Version: #{VERSION}
+                Orthus Technology
+             _____   ______ _____ _______ __   _ _______
+            |     | |_____/   |   |_____| | \\  | |_____|
+            |_____| |    \\_ __|__ |     | |  \\_| |     |
+
+                                         Version: #{VERSION}
 END
 
 end

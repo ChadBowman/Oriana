@@ -12,7 +12,7 @@ class Help < Control
 		case input.value.sub(/help ?/, '')
 		when ''
 			@out.post <<-EOF
-	Command                          |  Description
+	Command                            |  Description
 -----------------------------------------------------------------------------
 create profile (flags)               |  Create new Ebay profile.
 [fetch|get] token                    |  Authenticate Ebay profile for use.

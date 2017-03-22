@@ -1,5 +1,8 @@
-saves/*
-doc
-temp/*
+/doc`
+/temp
+/.idea
+/out
+src/saves
+Oriana.iml
 temp.rb
 test.rb
