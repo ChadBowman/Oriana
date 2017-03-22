@@ -2,16 +2,20 @@
 # Copyright:: Copyright (c) 2015 Orthus Technology
 # License::   Distributes under the same terms as Ruby
 require 'openssl'
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 require_relative 'view/Console'
 require_relative 'model/Profile'
 require_relative 'utility/Logger'
-Dir.glob('src/control/*').each do |file|
-    require_relative file[/control\/.*/]
-end
-#File.new('../saves/log.txt', 'w')
-#Logger.write "test"
+require_relative 'control/Control'
+require_relative 'control/SaveLoad'
+require_relative 'control/CreateProfile'
+require_relative 'control/FetchToken'
+require_relative 'control/ListItem'
+require_relative 'control/Help'
+require_realtive 'control/Start'
+
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+
 dir = Dir.pwd[/.*Oriana/]
 dims = [0, 0]
 
@@ -28,6 +32,7 @@ console.add_command ListItem.new
 console.add_command Help.new
 console.add_command Start.new
 
+# delete temp files
 begin
     t = Thread.new do
         Dir.foreach("#{dir}/temp/") do |f|
