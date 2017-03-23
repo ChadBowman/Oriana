@@ -12,15 +12,23 @@ require_relative 'control/CreateProfile'
 require_relative 'control/FetchToken'
 require_relative 'control/ListItem'
 require_relative 'control/Help'
-require_realtive 'control/Start'
+require_relative 'control/Start'
 
 OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 
 dir = Dir.pwd[/.*Oriana/]
-dims = [0, 0]
+init_file_path = "#{dir}/src/saves/init.or"
 
-File.read("#{dir}/src/saves/init.or").each_line do |line|
-    dims = line.sub('Dimensions: ', '').split(' ') if line.include? 'Dimensions'
+# handle initialization file
+if File.exist? init_file_path
+    File.read(init_file_path).each_line do |line|
+        dims = line.sub('Dimensions: ', '').split(' ') if line.include? 'Dimensions'
+    end
+else
+    File.open(init_file_path, 'w') do |file|
+        file.write 'Dimensions: 0 0'
+    end
+    dims = [0, 0]
 end
 
 console = Console.new( 'ORIANA', Oriana::WELCOME, dims.first.to_i, dims.last.to_i )
